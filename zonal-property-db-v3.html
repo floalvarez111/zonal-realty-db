@@ -1457,37 +1457,51 @@ function copyMessengerReply(id,btn){
   if(ok(p.finish)) specs+="• Unit Finish: "+p.finish+(ok(p.finishDetails)?" — "+p.finishDetails:"")+NL;
   var comp="";
   if(ok(p.sellingPrice)) comp+="• Selling Price: "+p.sellingPrice+NL;
-  // Show only Total Contract Price (not both TCP and Total Contract Price)
   if(ok(p.tcp)) comp+="• Total Contract Price: "+p.tcp+NL;
   if(ok(p.promo)) comp+="• Promo/Discount: "+p.promo+NL;
   if(ok(p.misc)) comp+="• Miscellaneous Fees: "+p.misc+NL;
   if(ok(p.reservation)) comp+="• Reservation Fee: "+p.reservation+NL;
-  if(ok(p.netDp)) comp+="• Net Down Payment: "+p.netDp+NL;
+  if(ok(p.loanable)) comp+="• Loanable Amount: "+p.loanable+NL;
 
-  // DP TRANCHES — proper format per line, no shortest/longest labels
+  // DP BREAKDOWN — format exactly like: 1st-9th month: ₱ 922.84 + ₱ 1,524.69
   var tranches="";
+  // First priority: dedicated tranche fields
   if(ok(p.tranche1Period)&&ok(p.tranche1Amount)){
+    if(ok(p.netDp)) tranches+="• Net Down Payment: "+p.netDp+NL;
     tranches+="• "+p.tranche1Period+": "+p.tranche1Amount+(ok(p.tranche1Add)?" + "+p.tranche1Add:"")+NL;
     if(ok(p.tranche2Period)&&ok(p.tranche2Amount))
       tranches+="• "+p.tranche2Period+": "+p.tranche2Amount+(ok(p.tranche2Add)?" + "+p.tranche2Add:"")+NL;
     if(ok(p.tranche3)) tranches+="• "+p.tranche3+NL;
-  } else if(ok(p.monthlyDp)||ok(p.monthlyDpLong)){
-    // Extract just the amount part (remove "/X mos" suffix for clean display)
-    var mdp=p.monthlyDpLong||p.monthlyDp;
-    var mdpShort=p.monthlyDp!==p.monthlyDpLong?p.monthlyDp:"";
-    if(mdpShort&&mdp&&mdpShort!==mdp){
-      tranches+="• Monthly DP: "+mdp+NL;
-      tranches+="• Monthly DP (shorter): "+mdpShort+NL;
-    } else {
-      tranches+="• Monthly DP: "+mdp+NL;
-    }
-  } else if(ok(p.dpAll)){
-    p.dpAll.split("|").map(function(s){return s.trim();}).filter(Boolean).forEach(function(part){
-      tranches+="• "+part.replace(/(\d+)\s*mos/i,"$1 months")+NL;
+  }
+  // Second priority: parse dpAll which has format "6mos: ₱922.84 +₱1,524.69 | 10th-12th: ₱333.33 +₱666.67"
+  else if(ok(p.dpAll)){
+    if(ok(p.netDp)) tranches+="• Net Down Payment: "+p.netDp+NL;
+    var parts=p.dpAll.split("|").map(function(s){return s.trim();}).filter(Boolean);
+    parts.forEach(function(part){
+      // Clean up: "6mos: ₱922.84 +₱1,524.69" → "6 months: ₱ 922.84 + ₱ 1,524.69"
+      var clean=part
+        .replace(/(\d+)(?:st|nd|rd|th)?\s*[-–]\s*(\d+)(?:st|nd|rd|th)?\s*mos?/gi,"$1-$2 months")
+        .replace(/(\d+)\s*mos?:/gi,"$1 months:")
+        .replace(/\+₱/g,"+ ₱")
+        .replace(/₱(\d)/g,"₱ $1");
+      tranches+="• "+clean+NL;
     });
   }
-  if(ok(p.dpMonths)&&!tranches) tranches+="• DP Terms: "+p.dpMonths+NL;
-  if(ok(p.loanable)) comp+="• Loanable Amount: "+p.loanable+NL;
+  // Third priority: simple monthly DP — just show one clean line, no shortest/longest labels
+  else if(ok(p.monthlyDp)||ok(p.monthlyDpLong)){
+    if(ok(p.netDp)) tranches+="• Net Down Payment: "+p.netDp+NL;
+    var mdp=ok(p.monthlyDpLong)?p.monthlyDpLong:p.monthlyDp;
+    // Remove the "/X mos" suffix for cleaner display if needed
+    tranches+="• Monthly DP: "+mdp+NL;
+    // Show second term only if meaningfully different
+    if(ok(p.monthlyDp)&&ok(p.monthlyDpLong)&&p.monthlyDp!==p.monthlyDpLong){
+      tranches+="• Monthly DP: "+p.monthlyDp+NL;
+    }
+  }
+  // Show net DP even if no tranche data
+  else if(ok(p.netDp)){
+    tranches+="• Net Down Payment: "+p.netDp+NL;
+  }
 
   // MONTHLY AMORTIZATION
   // Check otherFees for HDMF — extract and add to 30yr if term30 is missing
