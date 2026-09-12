@@ -457,6 +457,10 @@ body{font-family:"Inter",sans-serif;background:var(--cream);color:var(--ink);min
           </div>
         </div>
         <div class="field">
+          <label>Barangay</label>
+          <input type="text" id="f-brgy" placeholder="e.g. Brgy. San Bartolome" />
+        </div>
+        <div class="field">
           <label>Status</label>
           <select id="f-status">
             <option value="">Select</option>
@@ -1215,6 +1219,7 @@ function submitEntry(){
     position:document.getElementById("f-position").value,
     prov:document.getElementById("f-prov").value.trim(),
     city:document.getElementById("f-city").value.trim(),
+    brgy:document.getElementById("f-brgy").value.trim(),
     status:document.getElementById("f-status").value,
     tcp:document.getElementById("f-tcp").value.trim(),
     reservation:document.getElementById("f-reservation").value.trim(),
@@ -1287,7 +1292,7 @@ function submitEntry(){
   showToast("Property submitted by "+e.agent);
   setTimeout(()=>{
     document.getElementById("successMsg").style.display="none";
-    ["f-agent","f-source","f-name","f-dev","f-prov","f-city","f-model","f-tcp","f-selling-price","f-net-dp","f-reservation","f-dp","f-dp-months","f-monthly-dp","f-monthly-dp-long","f-dp-all","f-tranche1-period","f-tranche1-amount","f-tranche1-add","f-tranche2-period","f-tranche2-amount","f-tranche2-add","f-tranche3","f-loanable","f-term-30","f-income-30","f-term-25","f-income-25","f-term-20","f-income-20","f-term-15","f-income-15","f-term-10","f-income-10","f-term-5","f-income-5","f-lot","f-floor","f-block","f-lotnumber","f-finish-details","f-page","f-promo","f-misc","f-other-fees","f-highlights","f-notes","f-contact"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+    ["f-agent","f-source","f-name","f-dev","f-prov","f-city","f-brgy","f-model","f-tcp","f-selling-price","f-net-dp","f-reservation","f-dp","f-dp-months","f-monthly-dp","f-monthly-dp-long","f-dp-all","f-tranche1-period","f-tranche1-amount","f-tranche1-add","f-tranche2-period","f-tranche2-amount","f-tranche2-add","f-tranche3","f-loanable","f-term-30","f-income-30","f-term-25","f-income-25","f-term-20","f-income-20","f-term-15","f-income-15","f-term-10","f-income-10","f-term-5","f-income-5","f-lot","f-floor","f-block","f-lotnumber","f-finish-details","f-page","f-promo","f-misc","f-other-fees","f-highlights","f-notes","f-contact"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
     ["f-type","f-status","f-position","f-beds","f-finish","f-toilet"].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
     ["f-verlevel","f-type","f-status"].forEach(id=>{document.getElementById(id).selectedIndex=0;});
     document.querySelectorAll(".chip").forEach(c=>c.classList.remove("selected"));
@@ -1452,14 +1457,14 @@ function copyMessengerReply(id,btn){
   if(ok(p.finish)) specs+="• Unit Finish: "+p.finish+(ok(p.finishDetails)?" — "+p.finishDetails:"")+NL;
   var comp="";
   if(ok(p.sellingPrice)) comp+="• Selling Price: "+p.sellingPrice+NL;
-  if(ok(p.tcp)) comp+="• Total Contract Price (TCP): "+p.tcp+NL;
+  // Show only Total Contract Price (not both TCP and Total Contract Price)
+  if(ok(p.tcp)) comp+="• Total Contract Price: "+p.tcp+NL;
   if(ok(p.promo)) comp+="• Promo/Discount: "+p.promo+NL;
   if(ok(p.misc)) comp+="• Miscellaneous Fees: "+p.misc+NL;
   if(ok(p.reservation)) comp+="• Reservation Fee: "+p.reservation+NL;
   if(ok(p.netDp)) comp+="• Net Down Payment: "+p.netDp+NL;
-  if(ok(p.dp)&&!ok(p.netDp)) comp+="• Down Payment: "+p.dp+NL;
 
-  // DP TRANCHES — proper format per line
+  // DP TRANCHES — proper format per line, no shortest/longest labels
   var tranches="";
   if(ok(p.tranche1Period)&&ok(p.tranche1Amount)){
     tranches+="• "+p.tranche1Period+": "+p.tranche1Amount+(ok(p.tranche1Add)?" + "+p.tranche1Add:"")+NL;
@@ -1467,21 +1472,21 @@ function copyMessengerReply(id,btn){
       tranches+="• "+p.tranche2Period+": "+p.tranche2Amount+(ok(p.tranche2Add)?" + "+p.tranche2Add:"")+NL;
     if(ok(p.tranche3)) tranches+="• "+p.tranche3+NL;
   } else if(ok(p.monthlyDp)||ok(p.monthlyDpLong)){
-    // Show as monthly DP lines — NOT as DP Options
-    if(ok(p.monthlyDp)&&ok(p.monthlyDpLong)&&p.monthlyDp!==p.monthlyDpLong){
-      tranches+="• Monthly DP (shortest): "+p.monthlyDp+NL;
-      tranches+="• Monthly DP (longest): "+p.monthlyDpLong+NL;
+    // Extract just the amount part (remove "/X mos" suffix for clean display)
+    var mdp=p.monthlyDpLong||p.monthlyDp;
+    var mdpShort=p.monthlyDp!==p.monthlyDpLong?p.monthlyDp:"";
+    if(mdpShort&&mdp&&mdpShort!==mdp){
+      tranches+="• Monthly DP: "+mdp+NL;
+      tranches+="• Monthly DP (shorter): "+mdpShort+NL;
     } else {
-      tranches+="• Monthly DP: "+(p.monthlyDpLong||p.monthlyDp)+NL;
+      tranches+="• Monthly DP: "+mdp+NL;
     }
   } else if(ok(p.dpAll)){
-    // Parse pipe-separated: "6mos: ₱16,567 | 9mos: ₱11,044"
     p.dpAll.split("|").map(function(s){return s.trim();}).filter(Boolean).forEach(function(part){
-      var clean=part.replace(/(\d+)\s*mos/i,"$1 months");
-      tranches+="• "+clean+NL;
+      tranches+="• "+part.replace(/(\d+)\s*mos/i,"$1 months")+NL;
     });
   }
-  if(ok(p.dpMonths)&&!tranches) tranches+="• DP Terms available: "+p.dpMonths+NL;
+  if(ok(p.dpMonths)&&!tranches) tranches+="• DP Terms: "+p.dpMonths+NL;
   if(ok(p.loanable)) comp+="• Loanable Amount: "+p.loanable+NL;
 
   // MONTHLY AMORTIZATION
@@ -1501,16 +1506,16 @@ function copyMessengerReply(id,btn){
   terms.forEach(function(y){
     if(y==="30_hdmf"){
       amorts+="• 30 years: "+hdmfFromOther+NL;
-      if(ok(p.income30)) amorts.replace(NL,"")+" (min. income: "+p.income30+")"+NL;
+      if(ok(p.income30)) amorts.replace(NL,"")+" (required income: "+p.income30+")"+NL;
     } else {
       amorts+="• "+y+" years: "+p["term"+y]+"/mo";
-      if(ok(p["income"+y])) amorts+=" (min. income: "+p["income"+y]+")";
+      if(ok(p["income"+y])) amorts+=" (required income: "+p["income"+y]+")";
       amorts+=NL;
     }
   });
   // If required income is given separately (income30) but no term30 label
   if(!amorts&&ok(p.income30)&&hdmfFromOther){
-    amorts+="• 30 years: "+hdmfFromOther+" (min. income: "+p.income30+")"+NL;
+    amorts+="• 30 years: "+hdmfFromOther+" (required income: "+p.income30+")"+NL;
   }
 
   // OTHER FEES — exclude HDMF since it's now in amortization section
@@ -1522,7 +1527,7 @@ function copyMessengerReply(id,btn){
     if(cleaned&&cleaned!=="|") otherFees="• "+cleaned+NL;
   }
 
-  // HIGHLIGHTS — bullet form, one per line
+  // HIGHLIGHTS — bullet form, preserve mins/km exactly as entered
   var highlights="";
   if(ok(p.highlights)){
     var hLines=p.highlights.split("\n").filter(function(l){return l.trim();});
@@ -1531,10 +1536,12 @@ function copyMessengerReply(id,btn){
       return "• "+clean;
     }).join("\n");
   }
-  // Also check notes for landmark-style content if highlights is empty
-  if(!highlights&&ok(p.notes)&&(p.notes.includes("min")||p.notes.includes("km")||p.notes.includes("near")||p.notes.includes("malapit"))){
-    var nLines=p.notes.split(".").filter(function(l){return l.trim()&&(l.includes("min")||l.includes("km")||l.includes("near")||l.includes("malapit"));});
-    if(nLines.length>0) highlights=nLines.map(function(l){return "• "+l.trim();}).join("\n");
+  if(!highlights&&ok(p.notes)){
+    // Extract landmark sentences from notes
+    var nSents=p.notes.replace(/\.\s*/g,".\n").split("\n").filter(function(l){
+      return l.trim()&&(l.match(/\d+\s*(?:min|km|meter|m\b)/i)||/near|malapit|from|away/i.test(l));
+    });
+    if(nSents.length>0) highlights=nSents.map(function(l){return "• "+l.trim().replace(/\.$/,"");}).join("\n");
   }
   var fin=(function(){var f=p.financing;if(!f)return"";if(Array.isArray(f))return f.join(" / ");return String(f);})();
   var amortLabel="MONTHLY AMORTIZATION";
@@ -1543,9 +1550,14 @@ function copyMessengerReply(id,btn){
   else if(fin.includes("Bank")) amortLabel="MONTHLY AMORTIZATION — Bank Financing";
   else if(fin.includes("In-house")) amortLabel="MONTHLY AMORTIZATION — In-house";
   else if(fin.includes("Cash")) amortLabel="PAYMENT SCHEDULE";
+  // BUILD CLEAN MESSAGE
   var msg="Hi! Thank you for your interest \ud83d\ude0a\n\n";
   msg+="Here are the details for *"+p.name+(ok(p.model)?" — "+p.model:"")+"*:\n\n";
-  msg+="\ud83d\udccd *LOCATION*\n"+(p.city||"")+(p.prov?", "+p.prov:"")+"\n";
+  // LOCATION — include barangay
+  var loc="";
+  if(ok(p.brgy)) loc+=p.brgy+", ";
+  loc+=(p.city||"")+(p.prov?", "+p.prov:"");
+  msg+="\ud83d\udccd *LOCATION*\n"+loc+"\n";
   if(specs) msg+="\n\ud83c\udfe0 *UNIT SPECS*\n"+specs;
   if(comp||tranches){
     msg+="\n\ud83d\udcb0 *COMPUTATION*\n"+comp;
@@ -1553,7 +1565,7 @@ function copyMessengerReply(id,btn){
   }
   if(amorts) msg+="\n\ud83d\udcca *"+amortLabel+"*\n"+amorts;
   if(otherFees) msg+="\n\ud83d\udcb3 *OTHER FEES*\n"+otherFees;
-  if(fin) msg+="\n\ud83d\udcb3 *FINANCING*: "+fin+"\n";
+  // No financing line — already in amortLabel
   if(highlights) msg+="\n\ud83d\udccd *HIGHLIGHTS & NEARBY*\n"+highlights+"\n";
   msg+="\n\u26a0\ufe0f Prices are subject to change without prior notice.";
   msg+="\n\nFor site tripping and reservations, message us anytime! \ud83d\ude0a";
