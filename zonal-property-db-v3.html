@@ -1,0 +1,2479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Zonal Realty — Verified Property Database v3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --cream:#FAF7F2;--warm:#FFFDF9;--sand:#EDE8DF;--sand2:#D6CEBC;
+  --taupe:#9B9080;--brown:#6B5F4E;--ink:#2C2418;
+  --dark:#1A1611;--dark2:#252018;
+  --gold:#B8965A;--goldl:#F0E4CC;
+  --yes:#27500A;--yesbg:#EAF3DE;
+  --warn:#633806;--warnbg:#FAEEDA;
+  --no:#791F1F;--nobg:#FCEBEB;
+  --blue:#0C447C;--bluebg:#E6F1FB;
+  --flag:#854F0B;--flagbg:#FAEEDA;
+  --rad:10px;
+}
+body{font-family:"Inter",sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+
+/* HEADER */
+.hdr{background:var(--dark);padding:1.25rem 2rem;}
+.hdr-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.hdr-brand{display:flex;align-items:center;gap:.75rem;}
+.hdr-logo{width:40px;height:40px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:"Playfair Display",serif;font-size:1.1rem;font-weight:600;color:var(--dark);flex-shrink:0;}
+.hdr-title{font-family:"Playfair Display",serif;font-size:1.1rem;font-weight:600;color:#fff;}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.35);}
+.hdr-stats{display:flex;gap:1.25rem;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat-n{font-size:1.1rem;font-weight:600;color:var(--gold);}
+.stat-l{font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px;}
+
+/* TABS */
+.tab-nav{background:var(--dark2);border-bottom:1px solid rgba(255,255,255,.07);padding:0 2rem;position:relative;z-index:100;}
+.tab-nav-inner{max-width:1080px;margin:0 auto;display:flex;gap:0;}
+.tab-btn{padding:.8rem 1.35rem;font-family:"Inter",sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,.4);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap;pointer-events:auto;position:relative;z-index:101;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* PANELS */
+.panel{display:none;max-width:1080px;margin:0 auto;padding:1.5rem 2rem 3rem;}
+.panel.active{display:block;}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;}
+.toolbar input[type=text]{flex:1;min-width:180px;border:1px solid var(--sand2);border-radius:8px;padding:.55rem .85rem;font-family:"Inter",sans-serif;font-size:13px;background:var(--warm);color:var(--ink);outline:none;}
+.toolbar input[type=text]:focus{border-color:var(--gold);}
+.filter-sel{border:1px solid var(--sand2);border-radius:8px;padding:.55rem .7rem;font-family:"Inter",sans-serif;font-size:12px;background:var(--warm);color:var(--ink);outline:none;cursor:pointer;}
+.tool-btn{padding:.5rem 1rem;border-radius:8px;border:1px solid var(--sand2);background:var(--warm);font-family:"Inter",sans-serif;font-size:12px;font-weight:500;color:var(--brown);cursor:pointer;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:.35rem;}
+.tool-btn:hover{border-color:var(--gold);color:var(--dark);}
+.tool-btn.primary{background:var(--dark);color:#fff;border-color:var(--dark);}
+.tool-btn.primary:hover{background:var(--dark2);}
+.tool-btn.danger{color:var(--no);}
+.result-meta{font-size:12px;color:var(--taupe);margin-bottom:.85rem;}
+.result-meta span{color:var(--ink);font-weight:500;}
+
+/* PROPERTY CARD */
+.prop-card{background:var(--warm);border:1px solid var(--sand);border-radius:var(--rad);margin-bottom:.75rem;overflow:hidden;}
+.prop-card.flagged{border-color:#EF9F27;border-width:1.5px;}
+.card-top{padding:.9rem 1.1rem .7rem;border-bottom:1px solid var(--sand);display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;}
+.badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:.4rem;}
+.badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:3px;}
+.badge.rfo{background:var(--yesbg);color:var(--yes);}
+.badge.pre{background:var(--bluebg);color:var(--blue);}
+.badge.pag{background:var(--warnbg);color:var(--warn);}
+.badge.inv{background:#EEEDFE;color:#3C3489;}
+.badge.lux{background:#FBEAF0;color:#72243E;}
+.badge.soc{background:var(--yesbg);color:var(--yes);}
+.badge.ver-dev{background:var(--yesbg);color:var(--yes);}
+.badge.ver-agent{background:var(--bluebg);color:var(--blue);}
+.badge.ver-ref{background:var(--warnbg);color:var(--warn);}
+.badge.flagged{background:var(--flagbg);color:var(--flag);}
+.prop-name{font-family:"Playfair Display",serif;font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:.15rem;}
+.prop-dev{font-size:11px;color:var(--taupe);}
+.prop-tcp{font-size:.95rem;font-weight:600;color:var(--ink);text-align:right;}
+.prop-monthly{font-size:11px;color:var(--taupe);text-align:right;margin-top:1px;}
+.card-body{padding:.65rem 1.1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.2rem;}
+.ir{display:flex;justify-content:space-between;font-size:12px;padding:.2rem 0;border-bottom:.5px solid var(--sand);}
+.ir:last-child{border-bottom:none;}
+.ir .l{color:var(--taupe);}
+.ir .v{font-weight:500;text-align:right;max-width:60%;font-size:11px;}
+.flag-note{background:var(--flagbg);border-left:3px solid #EF9F27;border-radius:0 6px 6px 0;padding:.5rem .75rem;margin:.5rem 1.1rem;font-size:12px;color:var(--flag);line-height:1.5;}
+.card-footer{background:var(--cream);border-top:1px solid var(--sand);padding:.5rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;}
+.verifier{display:flex;align-items:center;gap:.5rem;}
+.v-avatar{width:24px;height:24px;border-radius:50%;background:var(--goldl);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:var(--brown);flex-shrink:0;}
+.v-name{font-size:11px;font-weight:500;color:var(--ink);}
+.v-date{font-size:10px;color:var(--taupe);}
+.card-actions{display:flex;gap:.4rem;flex-wrap:wrap;}
+.ca-btn{font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--sand2);background:transparent;cursor:pointer;font-family:"Inter",sans-serif;color:var(--brown);transition:all .15s;}
+.ca-btn:hover{border-color:var(--gold);color:var(--dark);}
+.ca-btn.del{color:var(--no);}
+.ca-btn.del:hover{border-color:var(--no);background:var(--nobg);}
+.ca-btn.flag-btn{color:var(--flag);}
+.ca-btn.flag-btn:hover{border-color:var(--flag);background:var(--flagbg);}
+.ca-btn.unflag{color:var(--yes);}
+.ca-btn.copied{color:var(--yes);border-color:var(--yesbg);}
+
+/* EMPTY */
+.empty{text-align:center;padding:3rem 1rem;color:var(--taupe);}
+.empty-ico{font-size:2.5rem;opacity:.3;margin-bottom:.75rem;}
+.empty h3{font-family:"Playfair Display",serif;font-size:1.1rem;color:var(--brown);margin-bottom:.3rem;}
+
+/* SUBMIT LAYOUT */
+.submit-grid{display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start;}
+@media(max-width:760px){.submit-grid{grid-template-columns:1fr;}}
+.form-card{background:var(--warm);border:1px solid var(--sand);border-radius:var(--rad);padding:1.5rem;}
+.form-card h2{font-family:"Playfair Display",serif;font-size:1.2rem;margin-bottom:.2rem;}
+.form-sub{font-size:12px;color:var(--taupe);margin-bottom:1.1rem;padding-bottom:.85rem;border-bottom:1px solid var(--sand);}
+.sec-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin:1rem 0 .6rem;display:flex;align-items:center;gap:.5rem;}
+.sec-lbl::after{content:"";flex:1;height:.5px;background:var(--sand);}
+.field{margin-bottom:.8rem;}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--brown);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.28rem;}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--sand2);border-radius:8px;padding:.52rem .72rem;font-family:"Inter",sans-serif;font-size:13px;color:var(--ink);background:var(--cream);outline:none;transition:border-color .2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);background:#fff;}
+.field input.ai-filled{border-color:#97C459;background:#F8FDF3;}
+.field textarea{resize:vertical;min-height:56px;line-height:1.5;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+.field .err{font-size:11px;color:var(--no);margin-top:3px;display:none;}
+.chip-lbl{font-size:11px;font-weight:600;color:var(--brown);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.35rem;}
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.8rem;}
+.chip{cursor:pointer;padding:4px 11px;border-radius:16px;font-size:12px;font-weight:500;border:1.5px solid var(--sand2);color:var(--brown);background:var(--cream);user-select:none;transition:all .15s;}
+.chip.selected{background:var(--dark);border-color:var(--dark);color:#fff;}
+.submit-btn{width:100%;padding:.78rem;background:var(--gold);border:none;border-radius:8px;font-family:"Playfair Display",serif;font-size:1rem;font-weight:600;color:var(--dark);cursor:pointer;transition:opacity .15s;margin-top:.4rem;}
+.submit-btn:hover{opacity:.87;}
+
+/* IMAGE UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--sand2);border-radius:10px;padding:1.5rem 1rem;text-align:center;transition:all .2s;background:var(--cream);margin-bottom:.5rem;cursor:default;}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--gold);background:var(--goldl);}
+.upload-zone-ico{font-size:2rem;margin-bottom:.4rem;opacity:.5;}
+.upload-zone p{font-size:13px;color:var(--taupe);}
+.upload-zone .uz-hint{font-size:11px;color:var(--sand2);margin-top:.25rem;}
+/* UPDATE MODAL UPLOAD ZONE */
+.upd-upload{border:2px dashed var(--sand2);border-radius:8px;padding:1rem;text-align:center;transition:all .2s;background:var(--cream);margin-bottom:.5rem;}
+.upd-upload:hover,.upd-upload.dragover{border-color:var(--gold);background:var(--goldl);}
+.upd-upload p{font-size:12px;color:var(--taupe);}
+
+/* AI EXTRACT BOX */
+.extract-box{background:var(--cream);border:1px solid var(--sand);border-radius:8px;padding:1rem;margin-bottom:1rem;display:none;}
+.extract-box.show{display:block;}
+.extract-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;}
+.extract-header h4{font-size:12px;font-weight:600;color:var(--brown);text-transform:uppercase;letter-spacing:.5px;}
+.extract-status{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;}
+.extract-status.reading{background:var(--warnbg);color:var(--warn);}
+.extract-status.done{background:var(--yesbg);color:var(--yes);}
+.extract-status.error{background:var(--nobg);color:var(--no);}
+.extract-preview{width:100%;max-height:160px;object-fit:contain;border-radius:6px;border:1px solid var(--sand);margin-bottom:.6rem;display:none;}
+.extract-fields{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;}
+.ef-row{display:flex;justify-content:space-between;font-size:11px;padding:.2rem 0;border-bottom:.5px solid var(--sand);}
+.ef-row .el{color:var(--taupe);}
+.ef-row .ev{font-weight:500;color:var(--ink);}
+.apply-btn{width:100%;margin-top:.6rem;padding:.5rem;background:var(--yes);color:#fff;border:none;border-radius:6px;font-family:"Inter",sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.apply-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* SIDEBAR CARDS */
+.side-card{background:var(--warm);border:1px solid var(--sand);border-radius:var(--rad);padding:1.1rem;margin-bottom:.85rem;}
+.side-card h3{font-family:"Playfair Display",serif;font-size:.95rem;margin-bottom:.65rem;padding-bottom:.5rem;border-bottom:1px solid var(--sand);}
+.rule{display:flex;gap:.5rem;margin-bottom:.5rem;font-size:12px;color:var(--ink);line-height:1.5;}
+.rule-ico{flex-shrink:0;font-size:13px;}
+.ver-row{display:flex;align-items:flex-start;gap:.6rem;margin-bottom:.5rem;font-size:12px;}
+.vdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.vdot.dev{background:var(--yes);}
+.vdot.agt{background:#185FA5;}
+.vdot.ref{background:var(--warn);}
+
+/* DRIVE PANEL */
+.drive-setup{background:var(--warm);border:1px solid var(--sand);border-radius:var(--rad);padding:1.5rem;max-width:600px;}
+.drive-setup h2{font-family:"Playfair Display",serif;font-size:1.2rem;margin-bottom:.25rem;}
+.drive-sub{font-size:12px;color:var(--taupe);margin-bottom:1.25rem;padding-bottom:.85rem;border-bottom:1px solid var(--sand);}
+.drive-step{display:flex;gap:.85rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--sand);}
+.drive-step:last-child{border-bottom:none;margin-bottom:0;}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--dark);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;font-family:"Playfair Display",serif;}
+.step-body h4{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:.25rem;}
+.step-body p{font-size:12px;color:var(--taupe);line-height:1.6;}
+.step-body code{background:var(--cream);border:1px solid var(--sand2);border-radius:4px;padding:1px 5px;font-size:11px;color:var(--brown);}
+.drive-field{margin-top:.6rem;}
+.drive-field label{display:block;font-size:11px;font-weight:600;color:var(--brown);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.28rem;}
+.drive-field input{width:100%;border:1.5px solid var(--sand2);border-radius:8px;padding:.52rem .72rem;font-family:"Inter",sans-serif;font-size:13px;color:var(--ink);background:var(--cream);outline:none;}
+.drive-field input:focus{border-color:var(--gold);}
+.drive-btn{margin-top:.6rem;padding:.55rem 1.2rem;background:var(--dark);color:#fff;border:none;border-radius:8px;font-family:"Inter",sans-serif;font-size:13px;font-weight:500;cursor:pointer;}
+.drive-status{margin-top:.5rem;font-size:12px;padding:.4rem .65rem;border-radius:6px;display:none;}
+.drive-status.ok{background:var(--yesbg);color:var(--yes);display:block;}
+.drive-status.err{background:var(--nobg);color:var(--no);display:block;}
+.drive-status.loading{background:var(--warnbg);color:var(--warn);display:block;}
+.folder-preview{background:var(--cream);border:1px solid var(--sand);border-radius:6px;padding:.6rem .85rem;font-family:"Inter",sans-serif;font-size:12px;color:var(--taupe);margin-top:.5rem;line-height:1.8;}
+.folder-preview .folder{color:var(--brown);font-weight:500;}
+
+/* UPDATE MODAL */
+.modal-wrap{display:none;position:fixed;inset:0;background:rgba(26,22,17,.65);z-index:500;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;}
+.modal-wrap.open{display:flex;}
+.modal-box{background:var(--warm);border-radius:var(--rad);width:100%;max-width:640px;margin:auto;display:flex;flex-direction:column;max-height:90vh;}
+.modal-hdr{background:var(--dark);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-hdr h3{font-family:"Playfair Display",serif;font-size:1.05rem;color:#fff;}
+.modal-hdr p{font-size:11px;color:rgba(255,255,255,.35);margin-top:1px;}
+.modal-close{background:transparent;border:none;color:rgba(255,255,255,.4);font-size:1.3rem;cursor:pointer;line-height:1;}
+.modal-close:hover{color:#fff;}
+.modal-body{padding:1.25rem;overflow-y:auto;flex:1;}
+.modal-section{margin-bottom:1rem;}
+.modal-section-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;}
+.modal-section-lbl::after{content:"";flex:1;height:.5px;background:var(--sand);}
+/* HISTORY TIMELINE */
+.history-wrap{background:var(--cream);border:1px solid var(--sand);border-radius:8px;padding:.75rem;max-height:180px;overflow-y:auto;margin-bottom:.85rem;}
+.history-empty{font-size:12px;color:var(--taupe);text-align:center;padding:.5rem;}
+.hist-entry{padding:.5rem 0;border-bottom:.5px solid var(--sand);display:grid;grid-template-columns:auto 1fr;gap:.6rem;}
+.hist-entry:last-child{border-bottom:none;padding-bottom:0;}
+.hist-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:4px;}
+.hist-meta{font-size:10px;color:var(--taupe);margin-bottom:.2rem;}
+.hist-changes{display:flex;flex-wrap:wrap;gap:4px;}
+.hist-chip{font-size:10px;background:var(--sand);color:var(--brown);padding:1px 7px;border-radius:8px;}
+.hist-chip.changed{background:var(--goldl);color:var(--warn);}
+/* UPDATE FIELDS */
+.upd-field{margin-bottom:.7rem;}
+.upd-field label{display:block;font-size:11px;font-weight:600;color:var(--brown);text-transform:uppercase;letter-spacing:.4px;margin-bottom:.25rem;}
+.upd-field input,.upd-field select,.upd-field textarea{width:100%;border:1.5px solid var(--sand2);border-radius:8px;padding:.5rem .7rem;font-family:"Inter",sans-serif;font-size:13px;color:var(--ink);background:var(--cream);outline:none;transition:border-color .2s;}
+.upd-field input:focus,.upd-field select:focus{border-color:var(--gold);background:#fff;}
+.upd-field input.changed{border-color:var(--gold);background:#FFFBF3;}
+.upd-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;}
+.modal-footer{padding:.85rem 1.25rem;border-top:1px solid var(--sand);display:flex;gap:.6rem;justify-content:flex-end;background:var(--cream);flex-shrink:0;}
+.modal-save{padding:.6rem 1.4rem;background:var(--gold);color:var(--dark);border:none;border-radius:8px;font-family:"Playfair Display",serif;font-size:.95rem;font-weight:600;cursor:pointer;}
+.modal-save:hover{opacity:.87;}
+.modal-cancel{padding:.6rem 1.1rem;background:transparent;border:1.5px solid var(--sand2);border-radius:8px;font-family:"Inter",sans-serif;font-size:13px;color:var(--brown);cursor:pointer;}
+.modal-cancel:hover{border-color:var(--brown);}
+/* UPDATE UPLOAD ZONE */
+.upd-upload{border:2px dashed var(--sand2);border-radius:8px;padding:1rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--cream);margin-bottom:.75rem;position:relative;}
+.upd-upload:hover{border-color:var(--gold);}
+.upd-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:1;}
+.upd-upload p{font-size:12px;color:var(--taupe);}
+.upd-extract{background:var(--cream);border:1px solid var(--sand);border-radius:6px;padding:.65rem;margin-bottom:.75rem;display:none;}
+.upd-extract.show{display:block;}
+.upd-extract-status{font-size:11px;padding:2px 8px;border-radius:8px;font-weight:500;display:inline-block;margin-bottom:.4rem;}
+.upd-extract-status.reading{background:var(--warnbg);color:var(--warn);}
+.upd-extract-status.done{background:var(--yesbg);color:var(--yes);}
+.upd-extract-status.err{background:var(--nobg);color:var(--no);}
+.upd-apply-btn{width:100%;padding:.4rem;background:var(--yes);color:#fff;border:none;border-radius:6px;font-family:"Inter",sans-serif;font-size:12px;font-weight:600;cursor:pointer;margin-top:.4rem;}
+.upd-apply-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--dark);color:#fff;padding:.6rem 1.1rem;border-radius:8px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;max-width:320px;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* HISTORY TABLE MODAL */
+.ht-wrap{position:fixed;inset:0;z-index:300;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem 1rem;overflow-y:auto;}
+.ht-overlay{position:fixed;inset:0;background:rgba(26,22,17,.7);z-index:-1;}
+.ht-box{background:var(--warm);border-radius:var(--rad);width:100%;max-width:900px;overflow:hidden;margin:auto;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.ht-hdr{background:var(--dark);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;}
+.ht-title{font-family:"Playfair Display",serif;font-size:1.05rem;color:#fff;margin-bottom:2px;}
+.ht-sub{font-size:11px;color:rgba(255,255,255,.35);}
+.ht-body{padding:1.25rem;}
+.ht-scroll{overflow-x:auto;}
+.ht-table{width:100%;border-collapse:collapse;min-width:500px;font-size:12px;}
+.ht-table thead th{background:var(--dark2);color:rgba(255,255,255,.7);padding:.6rem .85rem;text-align:left;font-weight:500;white-space:nowrap;}
+.ht-table thead th.ht-latest{background:var(--dark);color:var(--gold);}
+.ht-field-col{width:130px;background:var(--cream)!important;color:var(--brown)!important;font-weight:600!important;border-right:1px solid var(--sand);}
+.ht-ver-col{min-width:140px;vertical-align:top;}
+.ht-ver-label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;}
+.ht-ver-date{font-size:10px;opacity:.6;}
+.ht-ver-agent{font-size:10px;opacity:.5;}
+.ht-ver-note{font-size:10px;color:var(--gold);margin-top:3px;font-style:italic;}
+.ht-table tbody tr{border-bottom:.5px solid var(--sand);}
+.ht-table tbody tr:last-child{border-bottom:none;}
+.ht-table tbody tr:hover td{background:var(--cream);}
+.ht-field-name{font-weight:500;color:var(--brown);padding:.55rem .85rem;border-right:1px solid var(--sand);background:var(--cream);white-space:nowrap;}
+.ht-val{padding:.55rem .85rem;color:var(--ink);vertical-align:top;position:relative;}
+.ht-val.ht-changed{background:#FFFBF0;color:var(--warn);font-weight:500;}
+.ht-val.ht-latest-val{background:var(--goldl);}
+.ht-was{display:block;font-size:10px;color:var(--taupe);font-weight:400;margin-top:2px;text-decoration:line-through;}
+
+/* STALE BADGE in card */
+.badge.stale{background:#FFF3CD;color:#856404;}
+
+/* SUCCESS */
+.success-msg{background:var(--yesbg);border:1px solid #97C459;border-radius:8px;padding:.85rem 1.1rem;text-align:center;display:none;margin-top:.6rem;}
+.success-msg h3{font-family:"Playfair Display",serif;font-size:.95rem;color:var(--yes);margin-bottom:.15rem;}
+.success-msg p{font-size:11px;color:var(--yes);}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-brand">
+      <div class="hdr-logo">Z</div>
+      <div>
+        <div class="hdr-title">Verified Property Database</div>
+        <div class="hdr-sub">Zonal Realty PH — Agent Reference Tool v3</div>
+      </div>
+    </div>
+    <div class="hdr-stats">
+      <div class="stat"><div class="stat-n" id="sTotal">0</div><div class="stat-l">Projects</div></div>
+      <div class="stat"><div class="stat-n" id="sVer">0</div><div class="stat-l">Verified</div></div>
+      <div class="stat"><div class="stat-n" id="sFlag">0</div><div class="stat-l">Flagged</div></div>
+      <div class="stat"><div class="stat-n" id="sAgents">0</div><div class="stat-l">Contributors</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="tab-nav">
+  <div class="tab-nav-inner">
+    <button class="tab-btn active" id="tab-search" onclick="switchTab('search',this)" onmousedown="switchTab('search',this)">&#9906; Search</button>
+    <button class="tab-btn" id="tab-submit" onclick="switchTab('submit',this)" onmousedown="switchTab('submit',this)">&#43; Submit Property</button>
+    <button class="tab-btn" id="tab-drive" onclick="switchTab('drive',this)" onmousedown="switchTab('drive',this)">&#9729; Google Drive Sync</button>
+  </div>
+</div>
+
+<!-- ── SEARCH ── -->
+<div class="panel active" id="panel-search">
+  <div class="toolbar">
+    <input type="text" id="searchInput" placeholder="Project name, city, developer, price..." oninput="applySearch()" />
+    <select class="filter-sel" id="fProv" onchange="applySearch()"><option value="">All provinces</option></select>
+    <select class="filter-sel" id="fStatus" onchange="applySearch()">
+      <option value="">All status</option>
+      <option value="RFO">RFO</option>
+      <option value="Pre-Selling">Pre-Selling</option>
+      <option value="Ongoing Construction">Ongoing Construction</option>
+      <option value="RFO|Pre-Selling">RFO + Pre-Selling</option>
+      <option value="RFO|Ongoing Construction">RFO + Ongoing Construction</option>
+      <option value="Pre-Selling|Ongoing Construction">Pre-Selling + Ongoing</option>
+      <option value="RFO|Pre-Selling|Ongoing Construction">All three</option>
+    </select>
+    <select class="filter-sel" id="fFin" onchange="applySearch()">
+      <option value="">All financing</option>
+      <option value="Pag-IBIG">Pag-IBIG only</option>
+      <option value="Bank">Bank only</option>
+      <option value="In-house">In-house only</option>
+      <option value="Cash">Cash only</option>
+      <option value="Pag-IBIG|Bank">Pag-IBIG + Bank</option>
+      <option value="Pag-IBIG|In-house">Pag-IBIG + In-house</option>
+      <option value="Bank|In-house">Bank + In-house</option>
+      <option value="Pag-IBIG|Bank|In-house">Pag-IBIG + Bank + In-house</option>
+    </select>
+    <select class="filter-sel" id="fVer" onchange="applySearch()">
+      <option value="">All entries</option><option value="developer">Developer-confirmed</option>
+      <option value="agent">Agent-verified</option><option value="reference">Reference only</option>
+      <option value="flagged">Flagged only</option>
+    </select>
+    <button class="tool-btn" onclick="exportDB()">&#8681; Export</button>
+    <label class="tool-btn" style="cursor:pointer;">&#8679; Import<input type="file" accept=".json" style="display:none;" onchange="importDB(event)" /></label>
+    <button class="tool-btn danger" onclick="clearAllConfirm()">&#10005; Clear all</button>
+  </div>
+  <div class="result-meta" id="resultMeta"></div>
+  <div id="propList"></div>
+</div>
+
+<!-- ── SUBMIT ── -->
+<div class="panel" id="panel-submit">
+  <div class="submit-grid">
+    <div>
+      <div class="form-card">
+        <h2>Submit a Property</h2>
+        <p class="form-sub">Upload a developer image or brochure — the tool reads the figures automatically and fills in the fields for you.</p>
+
+        <div class="sec-lbl">Upload developer image or PDF (optional)</div>
+        <!-- Hidden file input — triggered by buttons below, NOT by absolute overlay -->
+        <input type="file" accept="image/*,application/pdf,.pdf" id="imageFileInput" style="display:none;" onchange="handleImageUpload(event)" />
+        <div class="upload-zone" id="uploadZone"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          ondrop="handleDrop(event)">
+          <div class="upload-zone-ico">&#128247;</div>
+          <p>Drag &amp; drop here, or use the buttons below</p>
+          <p class="uz-hint">PNG, JPG, WEBP, PDF supported &middot; Claude reads figures automatically</p>
+        </div>
+        <div style="display:flex;gap:.6rem;margin-bottom:1rem;margin-top:-.25rem;">
+          <button type="button" onclick="document.getElementById('imageFileInput').click()" style="flex:1;padding:.55rem;border:1.5px solid var(--sand2);border-radius:8px;background:var(--warm);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--brown);cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--sand2)'">&#128193; Browse Files</button>
+          <button type="button" onclick="openRawTextPaste()" style="flex:1;padding:.55rem;border:1.5px solid var(--sand2);border-radius:8px;background:var(--warm);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--brown);cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--sand2)'">&#128196; Paste Raw Text</button>
+        </div>
+
+        <div class="extract-box" id="extractBox">
+          <div class="extract-header">
+            <h4>AI Extraction</h4>
+            <span class="extract-status reading" id="extractStatus">Reading image...</span>
+          </div>
+          <img class="extract-preview" id="extractPreview" alt="uploaded image" />
+          <div class="extract-fields" id="extractFields"></div>
+          <button class="apply-btn" id="applyBtn" onclick="applyExtracted()" disabled>Apply to form fields</button>
+        </div>
+
+        <div class="sec-lbl">Your details</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Your Name *</label>
+            <input type="text" id="f-agent" placeholder="Maria Santos" />
+            <p class="err" id="e-agent">Required.</p>
+          </div>
+          <div class="field">
+            <label>Verification Level *</label>
+            <select id="f-verlevel">
+              <option value="">Select</option>
+              <option value="developer">Developer-confirmed</option>
+              <option value="agent">Agent-verified</option>
+              <option value="reference">Reference only</option>
+            </select>
+            <p class="err" id="e-verlevel">Required.</p>
+          </div>
+        </div>
+        <div class="field">
+          <label>Source / How verified</label>
+          <input type="text" id="f-source" placeholder="e.g. Called developer hotline, visited site, from official brochure..." />
+        </div>
+
+        <div class="sec-lbl">Property details</div>
+        <div class="field">
+          <label>Project Name *</label>
+          <input type="text" id="f-name" placeholder="e.g. Liora Homes Amora EcoLove" />
+          <p class="err" id="e-name">Required.</p>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Developer *</label>
+            <input type="text" id="f-dev" placeholder="e.g. Asia Land Best Properties" />
+            <p class="err" id="e-dev">Required.</p>
+          </div>
+          <div class="field">
+            <label>Property Type</label>
+            <select id="f-type">
+              <option value="">Select</option>
+              <option>Townhouse</option>
+              <option>Single Attached</option>
+              <option>Single Detached</option>
+              <option>Rowhouse</option>
+              <option>Duplex</option>
+              <option>Condo</option>
+              <option>Lot Only</option>
+              <option>Farm Lot</option>
+              <option>Commercial Lot</option>
+              <option>Foreclosed Property</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>House Model / Unit Type</label>
+            <input type="text" id="f-model" placeholder="e.g. Carnation, Jasmine Expanded, Linnea, 2BR" />
+          </div>
+          <div class="field">
+            <label>Unit Position</label>
+            <select id="f-position">
+              <option value="">Select (if applicable)</option>
+              <option>Inner Unit</option>
+              <option>End Unit</option>
+              <option>Corner Lot</option>
+              <option>Corner End</option>
+              <option>Middle Unit</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+            <label>Province *</label>
+            <input type="text" id="f-prov" placeholder="e.g. Cavite" />
+            <p class="err" id="e-prov">Required.</p>
+          </div>
+          <div class="field">
+            <label>City / Municipality *</label>
+            <input type="text" id="f-city" placeholder="e.g. Naic" />
+            <p class="err" id="e-city">Required.</p>
+          </div>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="f-status">
+            <option value="">Select</option>
+            <option value="RFO">RFO (Ready for Occupancy)</option>
+            <option value="Pre-Selling">Pre-Selling</option>
+            <option value="Ongoing Construction">Ongoing Construction</option>
+            <option value="Sold Out">Sold Out</option>
+          </select>
+        </div>
+
+        <div class="sec-lbl">Pricing — auto-filled from image or enter manually</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Total Contract Price (TCP)</label>
+            <input type="text" id="f-tcp" placeholder="e.g. ₱ 1,200,000" oninput="formatPeso(this)" />
+          </div>
+          <div class="field">
+            <label>Reservation Fee</label>
+            <input type="text" id="f-reservation" placeholder="e.g. ₱ 10,000" oninput="formatPeso(this)" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Down Payment (%)</label>
+            <input type="text" id="f-dp" placeholder="e.g. 10% — ₱ 120,000" />
+          </div>
+          <div class="field">
+            <label>DP Terms Available</label>
+            <input type="text" id="f-dp-months" placeholder="e.g. 6, 9, 10, 12, 15 months" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Monthly DP — Shortest Term (RFO)</label>
+            <input type="text" id="f-monthly-dp" placeholder="e.g. ₱ 16,567 / 6 mos" oninput="formatPeso(this)" />
+          </div>
+          <div class="field">
+            <label>Monthly DP — Longest Term (NRFO)</label>
+            <input type="text" id="f-monthly-dp-long" placeholder="e.g. ₱ 9,940 / 10 mos" oninput="formatPeso(this)" />
+          </div>
+        </div>
+        <div class="field">
+          <label>All DP Options (full breakdown)</label>
+          <input type="text" id="f-dp-all" placeholder="e.g. 6mos: ₱16,567 | 9mos: ₱11,044 | 10mos: ₱9,940" />
+        </div>
+          <div class="field">
+            <label>Loanable Amount</label>
+            <input type="text" id="f-loanable" placeholder="e.g. ₱ 1,080,000" oninput="formatPeso(this)" />
+          </div>
+        </div>
+
+        <div class="sec-lbl" id="amort-section-label">Monthly Amortization per Loan Term</div>
+        <div class="field-row">
+          <div class="field">
+            <label>30 Years — Monthly Amort.</label>
+            <input type="text" id="f-term-30" placeholder="e.g. ₱ 6,500" oninput="formatPeso(this)" />
+          </div>
+          <div class="field">
+            <label>30 Years — Required Income</label>
+            <input type="text" id="f-income-30" placeholder="e.g. ₱ 21,667" oninput="formatPeso(this)" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>25 Years — Monthly Amort.</label>
+            <input type="text" id="f-term-25" placeholder="e.g. ₱ 7,200" oninput="formatPeso(this)" />
+          </div>
+          <div class="field">
+            <label>25 Years — Required Income</label>
+            <input type="text" id="f-income-25" placeholder="e.g. ₱ 24,000" oninput="formatPeso(this)" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>20 Years — Monthly Amort.</label>
+            <input type="text" id="f-term-20" placeholder="e.g. ₱ 8,100" oninput="formatPeso(this)" />
+          </div>
+          <div class="field">
+            <label>20 Years — Required Income</label>
+            <input type="text" id="f-income-20" placeholder="e.g. ₱ 27,000" oninput="formatPeso(this)" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>15 Years — Monthly Amort.</label>
+            <input type="text" id="f-term-15" placeholder="e.g. ₱ 9,500" oninput="formatPeso(this)" />
+          </div>
+          <div class="field">
+            <label>15 Years — Required Income</label>
+            <input type="text" id="f-income-15" placeholder="e.g. ₱ 31,667" oninput="formatPeso(this)" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>10 Years — Monthly Amort.</label>
+            <input type="text" id="f-term-10" placeholder="e.g. ₱ 12,500" oninput="formatPeso(this)" />
+          </div>
+          <div class="field">
+            <label>10 Years — Required Income</label>
+            <input type="text" id="f-income-10" placeholder="e.g. ₱ 41,667" oninput="formatPeso(this)" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>5 Years — Monthly Amort.</label>
+            <input type="text" id="f-term-5" placeholder="e.g. ₱ 20,000" oninput="formatPeso(this)" />
+          </div>
+          <div class="field">
+            <label>5 Years — Required Income</label>
+            <input type="text" id="f-income-5" placeholder="e.g. ₱ 66,667" oninput="formatPeso(this)" />
+          </div>
+        </div>
+
+        <div class="sec-lbl">Unit Details</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Bedrooms</label>
+            <select id="f-beds">
+              <option value="">Select</option>
+              <option value="1 Bedroom">1 Bedroom</option>
+              <option value="2 Bedrooms">2 Bedrooms</option>
+              <option value="3 Bedrooms">3 Bedrooms</option>
+              <option value="4 Bedrooms">4 Bedrooms</option>
+              <option value="Provision for 1 Bedroom">Provision for 1 Bedroom</option>
+              <option value="Provision for 2 Bedrooms">Provision for 2 Bedrooms</option>
+              <option value="Provision for 3 Bedrooms">Provision for 3 Bedrooms</option>
+              <option value="Studio">Studio</option>
+              <option value="TBC">TBC — To be confirmed</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Toilet &amp; Bath</label>
+            <select id="f-toilet">
+              <option value="">Select</option>
+              <option value="1 Toilet &amp; Bath">1 Toilet &amp; Bath</option>
+              <option value="2 Toilets &amp; Baths">2 Toilets &amp; Baths</option>
+              <option value="3 Toilets &amp; Baths">3 Toilets &amp; Baths</option>
+              <option value="Provision for T&amp;B">Provision for T&amp;B</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Unit Finish</label>
+            <select id="f-finish">
+              <option value="">Select</option>
+              <option value="Bare">Bare</option>
+              <option value="Semi-Finished">Semi-Finished</option>
+              <option value="With Improvement">With Improvement</option>
+              <option value="Fully Finished">Fully Finished</option>
+              <option value="TBC">TBC — To be confirmed</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Finish Details</label>
+            <input type="text" id="f-finish-details" placeholder="e.g. Tiles and Window Grills" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Lot Area (sqm)</label>
+            <input type="text" id="f-lot" placeholder="e.g. 36 sqm" />
+          </div>
+          <div class="field">
+            <label>Floor Area (sqm)</label>
+            <input type="text" id="f-floor" placeholder="e.g. 22 sqm" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Block</label>
+            <input type="text" id="f-block" placeholder="e.g. Block 3" />
+          </div>
+          <div class="field">
+            <label>Lot Number</label>
+            <input type="text" id="f-lotnumber" placeholder="e.g. Lot 12" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Page Code (your FB page)</label>
+            <input type="text" id="f-page" placeholder="e.g. PAG, BAT, LAG" />
+          </div>
+          <div class="field">
+            <label>Agent Contact Number</label>
+            <input type="text" id="f-contact" placeholder="e.g. 09474439764" />
+          </div>
+        </div>
+
+        <div class="sec-lbl">Pricing Details</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Selling Price (if different from TCP)</label>
+            <input type="text" id="f-selling-price" placeholder="e.g. ₱ 715,278 (before misc fees)" oninput="formatPeso(this)" />
+          </div>
+          <div class="field">
+            <label>Net DP / Net Equity</label>
+            <input type="text" id="f-net-dp" placeholder="e.g. ₱ 25,027.78" oninput="formatPeso(this)" />
+          </div>
+        </div>
+
+        <div class="sec-lbl">DP Tranches</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Tranche 1 — Period</label>
+            <input type="text" id="f-tranche1-period" placeholder="e.g. 1st–9th month" />
+          </div>
+          <div class="field">
+            <label>Tranche 1 — Monthly Amount</label>
+            <input type="text" id="f-tranche1-amount" placeholder="e.g. ₱ 922.84" oninput="formatPeso(this)" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Tranche 1 — Additional (if any)</label>
+            <input type="text" id="f-tranche1-add" placeholder="e.g. + ₱ 1,524.69 (PDC)" />
+          </div>
+          <div class="field">
+            <label>Tranche 2 — Period</label>
+            <input type="text" id="f-tranche2-period" placeholder="e.g. 10th–12th month" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Tranche 2 — Monthly Amount</label>
+            <input type="text" id="f-tranche2-amount" placeholder="e.g. ₱ 333.33" oninput="formatPeso(this)" />
+          </div>
+          <div class="field">
+            <label>Tranche 2 — Additional (if any)</label>
+            <input type="text" id="f-tranche2-add" placeholder="e.g. + ₱ 666.67 (PDC)" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Tranche 3 (if any)</label>
+          <input type="text" id="f-tranche3" placeholder="e.g. 13th month onwards: ₱ 500/mo" />
+        </div>
+
+        <div class="sec-lbl">Promos &amp; Fees</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Promo / Discount</label>
+            <input type="text" id="f-promo" placeholder="e.g. ₱ 50,000 discount until Dec 2026" />
+          </div>
+          <div class="field">
+            <label>Miscellaneous Fees</label>
+            <input type="text" id="f-misc" placeholder="e.g. ₱ 15,722.22" oninput="formatPeso(this)" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Other Fees / HDMF / Notes on Computation</label>
+          <input type="text" id="f-other-fees" placeholder="e.g. HDMF: ₱ 4,404.09 | Meralco: ₱ 8,000" />
+        </div>
+
+        <div class="sec-lbl">Financing accepted</div>
+        <div class="chip-row" id="finChips">
+          <span class="chip" data-val="Pag-IBIG">Pag-IBIG</span>
+          <span class="chip" data-val="Bank">Bank</span>
+          <span class="chip" data-val="In-house">In-house</span>
+          <span class="chip" data-val="Cash">Cash</span>
+          <span class="chip" data-val="Assume Balance">Assume Balance</span>
+          <span class="chip" data-val="Rent-to-Own">Rent-to-Own</span>
+        </div>
+
+        <div class="sec-lbl">Tags</div>
+        <div class="chip-row" id="tagChips">
+          <span class="chip" data-val="rfo">RFO</span>
+          <span class="chip" data-val="pre">Pre-Selling</span>
+          <span class="chip" data-val="pag">Pag-IBIG</span>
+          <span class="chip" data-val="inv">Investment</span>
+          <span class="chip" data-val="lux">Luxury</span>
+          <span class="chip" data-val="soc">Socialized</span>
+          <span class="chip" data-val="for">Foreclosed</span>
+        </div>
+
+        <div class="sec-lbl">Project Highlights &amp; Landmarks</div>
+        <div class="field">
+          <label>Key Points — one per line, include minutes away</label>
+          <textarea id="f-highlights" rows="5" placeholder="Near CALAX Naic exit — 5 mins&#10;SM Naic — 10 mins&#10;Ospital ng Naic — 8 mins&#10;Naic Elementary School — 3 mins&#10;Gated community with 24-hr security&#10;Elevated lot — flood-free area"></textarea>
+        </div>
+        <div class="sec-lbl">Agent Notes</div>
+        <div class="field">
+          <label>Internal notes — buyer FAQs, tripping tips, agent reminders</label>
+          <textarea id="f-notes" rows="3" placeholder="e.g. Buyers ask about flood — area is elevated. Best unit: corner lot. Ask for Ate Forcia on site."></textarea>
+        </div>
+
+        <button class="submit-btn" onclick="submitEntry()">Submit to Database</button>
+        <div class="success-msg" id="successMsg">
+          <h3>Submitted!</h3>
+          <p>Added with your name attached. Export to share with the team.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="side-card">
+        <h3>How image extraction works</h3>
+        <div class="rule"><span class="rule-ico">1.</span><span>Upload any developer image — pricelist table, brochure, or Messenger screenshot.</span></div>
+        <div class="rule"><span class="rule-ico">2.</span><span>Claude reads the image and extracts TCP, reservation fee, monthly amortization, DP terms, loanable amount, and loan term.</span></div>
+        <div class="rule"><span class="rule-ico">3.</span><span>Review the extracted figures, then hit "Apply to form fields" — all pricing fields fill automatically.</span></div>
+        <div class="rule"><span class="rule-ico">4.</span><span>Manually correct anything the AI missed. You always have final say on the numbers.</span></div>
+      </div>
+      <div class="side-card">
+        <h3>Verification levels</h3>
+        <div class="ver-row"><div class="vdot dev"></div><div><strong style="font-size:12px;">Developer-confirmed</strong><div style="font-size:11px;color:var(--taupe);margin-top:1px;">Direct from official sales team or site visit.</div></div></div>
+        <div class="ver-row"><div class="vdot agt"></div><div><strong style="font-size:12px;">Agent-verified</strong><div style="font-size:11px;color:var(--taupe);margin-top:1px;">Personally confirmed via brochure or transaction.</div></div></div>
+        <div class="ver-row"><div class="vdot ref"></div><div><strong style="font-size:12px;">Reference only</strong><div style="font-size:11px;color:var(--taupe);margin-top:1px;">Online source. Verify before quoting to buyers.</div></div></div>
+      </div>
+      <div class="side-card">
+        <h3>Export &amp; Import</h3>
+        <p style="font-size:12px;color:var(--taupe);line-height:1.6;">Use <strong>Export</strong> on the Search tab to download your database as a JSON file. Share with teammates. They use <strong>Import</strong> to merge entries into their copy. Duplicate IDs are skipped automatically.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DRIVE ── -->
+<div class="panel" id="panel-drive">
+  <div class="drive-setup">
+    <h2>Google Drive Auto-Sync</h2>
+    <p class="drive-sub">One-time setup — after this, every submission and update pushes to Drive automatically at <strong>Province → City → ProjectName.json</strong></p>
+
+    <div class="drive-step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Create your Apps Script</h4>
+        <p>Go to <strong>script.google.com</strong> → New Project → paste the script below → click Save.</p>
+        <div style="background:var(--cream);border:1px solid var(--sand);border-radius:6px;padding:.65rem .85rem;margin-top:.5rem;font-size:11px;color:var(--taupe);line-height:1.7;">
+          Download <strong>DriveSync-AppScript.js</strong> (shared with you separately) and paste its full contents into the Apps Script editor. The root folder ID is already set to your Zonal Realty Property Database folder.
+        </div>
+      </div>
+    </div>
+
+    <div class="drive-step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Deploy as Web App</h4>
+        <p>In the Apps Script editor: <strong>Deploy → New deployment → Web app</strong></p>
+        <p style="margin-top:.4rem;">Set <code>Execute as</code>: <strong>Me</strong> &nbsp;|&nbsp; <code>Who has access</code>: <strong>Anyone</strong> → Deploy → Copy the Web App URL.</p>
+      </div>
+    </div>
+
+    <div class="drive-step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Paste your Web App URL here</h4>
+        <div class="drive-field">
+          <label>Apps Script Web App URL</label>
+          <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/AKfy.../exec"
+            value="" oninput="localStorage.setItem('zonal_gas_url_draft',this.value)" />
+        </div>
+        <button class="drive-btn" onclick="pingDrive()">Test Connection</button>
+        <div class="drive-status" id="gasStatus"></div>
+      </div>
+    </div>
+
+    <div class="drive-step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Sync existing entries</h4>
+        <p>Push all entries currently in your local database to Drive. New submissions sync automatically from now on.</p>
+        <button class="drive-btn" onclick="syncAllToDrive()">Sync All to Drive</button>
+        <div class="drive-status" id="syncAllStatus"></div>
+      </div>
+    </div>
+
+    <div class="drive-step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Pull from Drive</h4>
+        <p>Pull entries submitted by other agents from the shared Drive folder and merge into your local copy.</p>
+        <button class="drive-btn" onclick="pullAllFromDrive()">Pull from Drive</button>
+        <div class="drive-status" id="pullAllStatus"></div>
+      </div>
+    </div>
+
+    <div class="drive-step">
+      <div class="step-num" style="background:var(--gold);color:var(--dark);">&#9729;</div>
+      <div class="step-body">
+        <h4>Current sync status</h4>
+        <div id="syncStatusDisplay" style="font-size:12px;color:var(--taupe);margin-top:.25rem;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- COMPARE UNITS MODAL -->
+<div class="modal-wrap" id="compareModal">
+  <div class="modal-box" style="max-width:720px;">
+    <div class="modal-hdr">
+      <div>
+        <h3 id="compareTitle">Compare Units</h3>
+        <p>Inner vs End vs Corner — side by side</p>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('compareModal').classList.remove('open');document.body.style.overflow='';">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div id="compareContent"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="document.getElementById('compareModal').classList.remove('open');document.body.style.overflow='';">Close</button>
+      <button class="modal-save" onclick="copyCompare()">&#128203; Copy Comparison</button>
+    </div>
+  </div>
+</div>
+
+<!-- RAW TEXT PASTE MODAL -->
+<div class="modal-wrap" id="rawTextModal">
+  <div class="modal-box" style="max-width:580px;">
+    <div class="modal-hdr">
+      <div>
+        <h3>Paste Raw Text</h3>
+        <p>From Excel, ChatGPT, Messenger, or any text source — zero API cost</p>
+      </div>
+      <button class="modal-close" onclick="closeRawTextModal()">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--goldl);border-radius:8px;padding:.75rem 1rem;margin-bottom:1rem;font-size:12px;color:var(--brown);line-height:1.7;">
+        <strong>How to use:</strong> Paste your data below → click the gold button → fields auto-fill. Tip: press <strong>Ctrl+Enter</strong> to parse without clicking.
+      </div>
+      <div class="upd-field">
+        <label>Paste your raw data here</label>
+        <textarea id="rawTextInput" rows="8" style="width:100%;border:1.5px solid var(--sand2);border-radius:8px;padding:.65rem .85rem;font-family:'Inter',sans-serif;font-size:13px;color:var(--ink);background:var(--cream);outline:none;resize:vertical;line-height:1.6;" placeholder="Project: Liora Homes Naic
+TCP: ₱ 2,462,400
+Reservation Fee: ₱ 12,000
+30 years monthly amortization: ₱ 14,476 — required income: ₱ 41,359
+25 years monthly amortization: ₱ 15,509 — required income: ₱ 44,311"></textarea>
+      </div>
+
+      <!-- Parse button — multiple trigger methods for maximum compatibility -->
+      <div style="margin-top:.85rem;text-align:center;">
+        <a href="javascript:void(0)"
+           onclick="parseRawText();return false;"
+           onmouseup="parseRawText()"
+           ontouchend="parseRawText()"
+           style="display:block;width:100%;padding:.85rem;background:var(--gold);color:var(--dark);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;border:none;border-radius:8px;cursor:pointer;letter-spacing:.3px;text-decoration:none;box-sizing:border-box;">
+          &#128196; Parse &amp; Fill Fields
+        </a>
+        <p style="font-size:11px;color:var(--taupe);margin-top:.5rem;">Or press <strong>Ctrl+Enter</strong> after pasting</p>
+        <a href="javascript:void(0)"
+           onclick="closeRawTextModal();return false;"
+           style="display:block;width:100%;margin-top:.4rem;padding:.6rem;background:transparent;color:var(--taupe);font-family:'Inter',sans-serif;font-size:13px;border:1px solid var(--sand2);border-radius:8px;cursor:pointer;text-decoration:none;box-sizing:border-box;">
+          Cancel
+        </a>
+      </div>
+
+      <div id="rawParseResult" style="display:none;background:var(--yesbg);border:1px solid #97C459;border-radius:8px;padding:.75rem 1rem;margin-top:.75rem;font-size:12px;color:var(--yes);line-height:1.8;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- UPDATE ENTRY MODAL -->
+<div class="modal-wrap" id="updateModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div>
+        <h3 id="modalTitle">Update Entry</h3>
+        <p id="modalSub">New figures are added on top — old data is kept in history.</p>
+      </div>
+      <button class="modal-close" onclick="closeUpdateModal()">&#10005;</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <div class="modal-section-lbl">Upload new developer image (optional)</div>
+        <div class="upd-upload" id="updUploadZone"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          ondrop="handleUpdDrop(event)">
+          <p>Drag &amp; drop new pricelist here</p>
+          <p style="font-size:11px;color:var(--sand2);margin-top:3px;">PNG, JPG, WEBP, PDF</p>
+        </div>
+        <input type="file" accept="image/*,application/pdf,.pdf" id="updImageInput" style="display:none;" onchange="handleUpdImage(event)" />
+        <div style="display:flex;gap:.5rem;margin-top:-.5rem;margin-bottom:.75rem;">
+          <button type="button" onclick="document.getElementById('updImageInput').click()" style="flex:1;padding:.45rem;border:1.5px solid var(--sand2);border-radius:7px;background:var(--warm);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:var(--brown);cursor:pointer;" >&#128193; Browse</button>
+          <button type="button" onclick="pasteUpdFromClipboard()" style="flex:1;padding:.45rem;border:1.5px solid var(--sand2);border-radius:7px;background:var(--warm);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:var(--brown);cursor:pointer;">&#128203; Paste Image</button>
+        </div>
+        <div class="upd-extract" id="updExtractBox">
+          <span class="upd-extract-status reading" id="updExtractStatus">Reading image...</span>
+          <div id="updExtractFields" style="margin-top:.4rem;font-size:11px;color:var(--taupe);"></div>
+          <button class="upd-apply-btn" id="updApplyBtn" onclick="applyUpdExtracted()" disabled>Apply extracted figures to fields below</button>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-lbl">Updated by</div>
+        <div class="upd-row">
+          <div class="upd-field">
+            <label>Your Name *</label>
+            <input type="text" id="upd-agent" placeholder="Maria Santos" />
+          </div>
+          <div class="upd-field">
+            <label>Verification Level *</label>
+            <select id="upd-verlevel">
+              <option value="">Select</option>
+              <option value="developer">Developer-confirmed</option>
+              <option value="agent">Agent-verified</option>
+              <option value="reference">Reference only</option>
+            </select>
+          </div>
+        </div>
+        <div class="upd-field">
+          <label>Source / How verified</label>
+          <input type="text" id="upd-source" placeholder="e.g. New pricelist from developer group chat, Oct 2026" />
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-lbl">Updated figures — only fill what changed</div>
+        <div class="upd-row">
+          <div class="upd-field"><label>Total Contract Price (TCP)</label><input type="text" id="upd-tcp" placeholder="Leave blank if unchanged" /></div>
+          <div class="upd-field"><label>Reservation Fee</label><input type="text" id="upd-reservation" placeholder="Leave blank if unchanged" /></div>
+        </div>
+        <div class="upd-row">
+          <div class="upd-field"><label>Monthly Amortization</label><input type="text" id="upd-monthly" placeholder="Leave blank if unchanged" /></div>
+          <div class="upd-field"><label>Down Payment Terms</label><input type="text" id="upd-dp" placeholder="Leave blank if unchanged" /></div>
+        </div>
+        <div class="upd-row">
+          <div class="upd-field"><label>Loanable Amount</label><input type="text" id="upd-loanable" placeholder="Leave blank if unchanged" /></div>
+          <div class="upd-field"><label>Loan Term</label><input type="text" id="upd-term" placeholder="Leave blank if unchanged" /></div>
+        </div>
+        <div class="upd-field"><label>Status</label>
+          <select id="upd-status">
+            <option value="">No change</option>
+            <option value="RFO">RFO</option>
+            <option value="Pre-Selling">Pre-Selling</option>
+            <option value="Under Construction">Under Construction</option>
+            <option value="Sold Out">Sold Out</option>
+          </select>
+        </div>
+        <div class="upd-field"><label>Update Notes (what changed and why)</label>
+          <input type="text" id="upd-notes" placeholder="e.g. Price increased, new promo released, units now RFO..." />
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-lbl">Change history</div>
+        <div class="history-wrap" id="historyWrap"></div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeUpdateModal()">Cancel</button>
+      <button class="modal-save" onclick="saveUpdate()">Save Update</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SK = "zonal_prop_db_v3";
+const APIKEY = "";
+
+function loadDB(){try{return JSON.parse(localStorage.getItem(SK))||[];}catch(e){return[];}}
+function saveDB(db){localStorage.setItem(SK,JSON.stringify(db));}
+function init(){buildProvFilter();refreshStats();applySearch();document.querySelectorAll(".chip").forEach(c=>{c.addEventListener("click",()=>{c.classList.toggle("selected");if(c.closest("#finChips"))updateAmortLabel();});});}
+function switchTab(t,btn){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  const panel=document.getElementById("panel-"+t);
+  if(panel)panel.classList.add("active");
+  const tabBtn=btn||document.getElementById("tab-"+t);
+  if(tabBtn)tabBtn.classList.add("active");
+  if(t==="search")applySearch();
+}
+
+// Keyboard shortcuts: Alt+1=Search, Alt+2=Submit, Alt+3=Drive
+document.addEventListener("keydown",function(e){
+  if(e.altKey&&e.key==="1"){switchTab("search");return;}
+  if(e.altKey&&e.key==="2"){switchTab("submit");return;}
+  if(e.altKey&&e.key==="3"){switchTab("drive");return;}
+});
+// ── PESO FORMATTER ──
+function updateAmortLabel(){
+  const selected=[];
+  document.querySelectorAll("#finChips .chip.selected").forEach(c=>selected.push(c.dataset.val));
+  const lbl=document.getElementById("amort-section-label");
+  if(!lbl)return;
+  if(selected.includes("Pag-IBIG")&&selected.includes("Bank")) lbl.textContent="Monthly Amortization (Pag-IBIG / Bank) per Loan Term";
+  else if(selected.includes("Pag-IBIG")&&selected.includes("In-house")) lbl.textContent="Monthly Amortization (Pag-IBIG / In-house) per Loan Term";
+  else if(selected.includes("Bank")&&selected.includes("In-house")) lbl.textContent="Monthly Amortization (Bank / In-house) per Loan Term";
+  else if(selected.includes("Pag-IBIG")) lbl.textContent="Monthly Amortization — HDMF (Pag-IBIG) per Loan Term";
+  else if(selected.includes("Bank")) lbl.textContent="Monthly Amortization — Bank Financing per Loan Term";
+  else if(selected.includes("In-house")) lbl.textContent="Monthly Amortization — In-house Financing per Loan Term";
+  else if(selected.includes("Cash")) lbl.textContent="Payment Schedule per Term";
+  else lbl.textContent="Monthly Amortization per Loan Term";
+}
+
+// ── PESO FORMATTER ──
+function formatPeso(input) {
+  if (v === "") { input.value = ""; return; }
+  const parts = v.split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  input.value = "₱ " + parts.join(".");
+}
+
+// ── PROVINCE LIST — Zonal coverage ──
+const ZONAL_PROVINCES = [
+  "Cavite","Batangas","Laguna","Rizal","Bulacan",
+  "Pampanga","Tarlac","Nueva Ecija","Bataan","Zambales",
+  "Pangasinan","La Union","Ilocos Norte","Ilocos Sur",
+  "Albay","Camarines Sur","Naga","Legazpi",
+  "Cebu","Iloilo","Bacolod","Bohol",
+  "Davao","Cagayan de Oro","General Santos","Zamboanga","Bukidnon"
+];
+
+function buildProvFilter(){
+  const db=loadDB();
+  const dbProvs=new Set(db.map(p=>p.prov).filter(Boolean));
+  // Merge DB provinces + Zonal coverage list, sorted
+  const allProvs=[...new Set([...ZONAL_PROVINCES,...dbProvs])].sort();
+  const sel=document.getElementById("fProv");
+  sel.innerHTML='<option value="">All provinces</option>';
+  allProvs.forEach(p=>{
+    const o=document.createElement("option");
+    o.value=p;
+    o.textContent=p+(dbProvs.has(p)?" ("+db.filter(x=>x.prov===p).length+")":" — no entries yet");
+    sel.appendChild(o);
+  });
+}
+function refreshStats(){const db=loadDB();document.getElementById("sTotal").textContent=db.length;document.getElementById("sVer").textContent=db.filter(p=>p.verlevel==="developer"||p.verlevel==="agent").length;document.getElementById("sFlag").textContent=db.filter(p=>p.flagged).length;document.getElementById("sAgents").textContent=[...new Set(db.map(p=>p.agent).filter(Boolean))].length;}
+
+const VER={developer:{label:"Developer-confirmed",cls:"ver-dev",dot:"#27500A"},agent:{label:"Agent-verified",cls:"ver-agent",dot:"#185FA5"},reference:{label:"Reference only",cls:"ver-ref",dot:"#854F0B"}};
+const TAGS={rfo:["RFO","rfo"],pre:["Pre-Sell","pre"],pag:["Pag-IBIG","pag"],inv:["Investment","inv"],lux:["Luxury","lux"],soc:["Socialized","soc"]};
+function ini(n){return(n||"?").split(" ").map(w=>w[0]).join("").substring(0,2).toUpperCase();}
+
+function applySearch(){
+  const db=loadDB();
+  const q=(document.getElementById("searchInput").value||"").toLowerCase().trim();
+  const fP=document.getElementById("fProv").value;
+  const fS=document.getElementById("fStatus").value;
+  const fF=document.getElementById("fFin").value;
+  const fV=document.getElementById("fVer").value;
+  let r=db;
+  if(q)r=r.filter(p=>[p.name,p.dev,p.city,p.prov,p.tcp,p.notes,p.type,p.monthly,p.reservation].some(f=>f&&f.toLowerCase().includes(q)));
+  if(fP)r=r.filter(p=>p.prov===fP);
+  if(fS){
+    const statuses=fS.split("|");
+    r=r.filter(p=>statuses.some(s=>p.status===s));
+  }
+  if(fF){
+    const fins=fF.split("|");
+    // match if entry has ANY of the selected financing types
+    r=r.filter(p=>{const fa=Array.isArray(p.financing)?p.financing:(p.financing?[p.financing]:[]);return fins.every(f=>fa.some(pf=>pf.includes(f)));});
+  }
+  if(fV==="flagged")r=r.filter(p=>p.flagged);
+  else if(fV)r=r.filter(p=>p.verlevel===fV);
+  document.getElementById("resultMeta").innerHTML=`Showing <span>${r.length}</span> of <span>${db.length}</span> propert${db.length!==1?"ies":"y"}`;
+  renderList(r);
+}
+
+function renderList(items){
+  const list=document.getElementById("propList");
+  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-ico">&#8962;</div><h3>${loadDB().length===0?"No properties yet":"No results found"}</h3><p>${loadDB().length===0?"Switch to Submit to add the first property.":"Try different search terms."}</p></div>`;return;}
+  list.innerHTML=items.map(p=>{
+    const ver=VER[p.verlevel]||VER.reference;
+    const tagBadges=(p.tags||[]).map(t=>TAGS[t]?`<span class="badge ${TAGS[t][1]}">${TAGS[t][0]}</span>`:"").join("");
+    const flagBadge=p.flagged?`<span class="badge flagged">&#9873; Flagged: ${p.flagNote||"needs review"}</span>`:"";
+    const histCount=(p.history||[]).length;
+    const updBadge=histCount>0?`<span class="badge" style="background:var(--bluebg);color:var(--blue);">&#8635; ${histCount} update${histCount>1?"s":""} &middot; ${p.history[histCount-1].date}</span>`:`<span class="badge" style="background:var(--sand);color:var(--taupe);">Original entry</span>`;
+    const staleBadge=p.autoFlagged?`<span class="badge stale">&#9200; ${STALE_DAYS}d+ no update</span>`:``;
+    const verBadge=`<span class="badge ${ver.cls}"><span style="width:6px;height:6px;border-radius:50%;background:${ver.dot};display:inline-block;"></span>${ver.label}</span>`;
+    const fin=(()=>{const f=p.financing;if(!f)return"—";if(Array.isArray(f))return f.join(", ");return String(f);})();
+    return`<div class="prop-card${p.flagged?" flagged":""}">
+      <div class="card-top">
+        <div>
+          <div class="badges">${verBadge}${updBadge}${staleBadge}${tagBadges}${flagBadge}</div>
+          <div class="prop-name">${p.name||"Unnamed"}</div>
+          <div class="prop-dev">${p.dev||"—"} &middot; ${p.city||"—"}, ${p.prov||"—"}${p.type?" &middot; "+p.type:""}${p.model?" &middot; <span style='color:var(--gold);font-weight:500;'>"+p.model+"</span>":""}${p.position?" &middot; <span style='background:var(--goldl);color:var(--brown);font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600;'>"+p.position+"</span>":""}</div>
+        </div>
+        <div>
+          <div class="prop-tcp">${p.tcp||"Price TBC"}</div>
+          <div class="prop-monthly">${p.monthly?p.monthly+" / mo":""}</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div>
+          ${p.tcp?`<div class="ir"><span class="l">TCP</span><span class="v" style="font-weight:600;color:var(--ink);">${p.tcp}</span></div>`:""}
+          ${p.reservation?`<div class="ir"><span class="l">Reservation fee</span><span class="v">${p.reservation}</span></div>`:""}
+          ${p.dp?`<div class="ir"><span class="l">Down payment</span><span class="v">${p.dp}</span></div>`:""}
+          ${p.dpMonths?`<div class="ir"><span class="l">DP terms</span><span class="v">${p.dpMonths}</span></div>`:""}
+          ${p.dpAll?`<div class="ir"><span class="l">All DP options</span><span class="v" style="font-size:11px;">${p.dpAll}</span></div>`:""}
+          ${p.monthlyDp?`<div class="ir"><span class="l">Monthly DP (shortest)</span><span class="v">${p.monthlyDp}</span></div>`:""}
+          ${p.monthlyDpLong?`<div class="ir"><span class="l">Monthly DP (longest)</span><span class="v" style="color:var(--yes);font-weight:500;">${p.monthlyDpLong}</span></div>`:""}
+          ${p.loanable?`<div class="ir"><span class="l">Loanable</span><span class="v">${p.loanable}</span></div>`:""}
+          ${p.promo?`<div class="ir"><span class="l" style="color:var(--yes);">Promo</span><span class="v" style="color:var(--yes);font-weight:500;">${p.promo}</span></div>`:""}
+          ${p.misc?`<div class="ir"><span class="l">Misc fees</span><span class="v">${p.misc}</span></div>`:""}
+          ${p.otherFees?`<div class="ir"><span class="l">Other fees</span><span class="v" style="font-size:11px;">${p.otherFees}</span></div>`:""}
+        </div>
+        <div>
+          ${p.beds?`<div class="ir"><span class="l">Bedrooms</span><span class="v">${p.beds}</span></div>`:""}
+          ${p.finish?`<div class="ir"><span class="l">Unit finish</span><span class="v">${p.finish}</span></div>`:""}
+          ${p.lot?`<div class="ir"><span class="l">Lot area</span><span class="v">${p.lot.includes("sqm")?p.lot:p.lot+" sqm"}</span></div>`:""}
+          ${p.floor?`<div class="ir"><span class="l">Floor area</span><span class="v">${p.floor.includes("sqm")?p.floor:p.floor+" sqm"}</span></div>`:""}
+          <div class="ir"><span class="l">Financing</span><span class="v">${fin}</span></div>
+          ${p.status?`<div class="ir"><span class="l">Status</span><span class="v">${p.status}</span></div>`:""}
+          ${p.page?`<div class="ir"><span class="l">Page</span><span class="v">${p.page}</span></div>`:""}
+          ${p.source?`<div class="ir"><span class="l">Source</span><span class="v" style="color:var(--taupe);font-size:10px;">${p.source}</span></div>`:""}
+        </div>
+        ${(p.term30||p.term25||p.term20||p.term15||p.term10||p.term5)?`
+        <div style="grid-column:1/-1;">
+          <div class="ir" style="font-size:11px;font-weight:600;color:var(--gold);border-bottom:1px solid var(--sand);padding-bottom:4px;margin-bottom:4px;">Monthly Amortization per Term</div>
+          <table style="width:100%;font-size:11px;border-collapse:collapse;">
+            <tr style="background:var(--cream);">
+              <th style="text-align:left;padding:3px 6px;color:var(--taupe);font-weight:500;">Term</th>
+              <th style="text-align:right;padding:3px 6px;color:var(--taupe);font-weight:500;">Monthly</th>
+              <th style="text-align:right;padding:3px 6px;color:var(--taupe);font-weight:500;">Required Income</th>
+            </tr>
+            ${p.term30?`<tr><td style="padding:3px 6px;color:var(--brown);">30 years</td><td style="text-align:right;padding:3px 6px;font-weight:500;">${p.term30}</td><td style="text-align:right;padding:3px 6px;color:var(--taupe);">${p.income30||"—"}</td></tr>`:""}
+            ${p.term25?`<tr><td style="padding:3px 6px;color:var(--brown);">25 years</td><td style="text-align:right;padding:3px 6px;font-weight:500;">${p.term25}</td><td style="text-align:right;padding:3px 6px;color:var(--taupe);">${p.income25||"—"}</td></tr>`:""}
+            ${p.term20?`<tr><td style="padding:3px 6px;color:var(--brown);">20 years</td><td style="text-align:right;padding:3px 6px;font-weight:500;">${p.term20}</td><td style="text-align:right;padding:3px 6px;color:var(--taupe);">${p.income20||"—"}</td></tr>`:""}
+            ${p.term15?`<tr><td style="padding:3px 6px;color:var(--brown);">15 years</td><td style="text-align:right;padding:3px 6px;font-weight:500;">${p.term15}</td><td style="text-align:right;padding:3px 6px;color:var(--taupe);">${p.income15||"—"}</td></tr>`:""}
+            ${p.term10?`<tr><td style="padding:3px 6px;color:var(--brown);">10 years</td><td style="text-align:right;padding:3px 6px;font-weight:500;">${p.term10}</td><td style="text-align:right;padding:3px 6px;color:var(--taupe);">${p.income10||"—"}</td></tr>`:""}
+            ${p.term5?`<tr><td style="padding:3px 6px;color:var(--brown);">5 years</td><td style="text-align:right;padding:3px 6px;font-weight:500;">${p.term5}</td><td style="text-align:right;padding:3px 6px;color:var(--taupe);">${p.income5||"—"}</td></tr>`:""}
+          </table>
+        </div>`:""}
+        ${p.notes?`<div style="grid-column:1/-1;"><div class="ir"><span class="l">Notes</span><span class="v" style="max-width:75%;font-size:11px;color:var(--taupe);">${p.notes}</span></div></div>`:""}
+      </div>
+      ${p.flagged?`<div class="flag-note">&#9873; Flagged for review: ${p.flagNote||"Please verify this entry."}</div>`:""}
+      <div class="card-footer">
+        <div class="verifier">
+          <div class="v-avatar">${ini(p.agent)}</div>
+          <div><div class="v-name">${p.agent||"Unknown"}</div><div class="v-date">${p.date||"—"}</div></div>
+        </div>
+        <div class="card-actions">
+          <button class="ca-btn" onclick="copyPitch('${p.id}',this)">Copy pitch</button>
+          <button class="ca-btn" style="color:var(--blue);background:var(--bluebg);" onclick="copyMessengerReply('${p.id}',this)">&#128172; Messenger</button>
+          <button class="ca-btn" style="color:var(--blue);" onclick="openUpdateModal('${p.id}')">&#8635; Update</button>
+          <button class="ca-btn" style="color:var(--brown);" onclick="openHistoryTable('${p.id}')" title="View full version history">&#9776; History</button>
+          <button class="ca-btn" style="color:var(--yes);" onclick="notifyTeam('${p.id}')" title="Copy team notification message">&#128226; Notify</button>
+          <button class="ca-btn" style="color:var(--gold);" onclick="compareUnits('${p.id}')" title="Compare Inner / End / Corner units">&#9878; Compare</button>
+          <button class="ca-btn ${p.flagged?"unflag":"flag-btn"}" onclick="${p.flagged?`unflagEntry('${p.id}')`:`flagEntry('${p.id}')`}">${p.flagged?"&#10003; Unflag":"&#9873; Flag"}</button>
+          <button class="ca-btn del" onclick="deleteEntry('${p.id}')">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function getChips(id){return[...document.querySelectorAll(`#${id} .chip.selected`)].map(c=>c.dataset.val);}
+function validate(){let ok=true;[["f-agent","e-agent"],["f-verlevel","e-verlevel"],["f-name","e-name"],["f-dev","e-dev"],["f-prov","e-prov"],["f-city","e-city"]].forEach(([fid,eid])=>{const v=document.getElementById(fid).value.trim();document.getElementById(eid).style.display=v?"none":"block";if(!v)ok=false;});return ok;}
+
+function submitEntry(){
+  if(!validate())return;
+  const now=new Date();
+  const e={
+    id:"p_"+Date.now(),
+    agent:document.getElementById("f-agent").value.trim(),
+    verlevel:document.getElementById("f-verlevel").value,
+    source:document.getElementById("f-source").value.trim(),
+    name:document.getElementById("f-name").value.trim(),
+    dev:document.getElementById("f-dev").value.trim(),
+    type:document.getElementById("f-type").value,
+    model:document.getElementById("f-model").value.trim(),
+    position:document.getElementById("f-position").value,
+    prov:document.getElementById("f-prov").value.trim(),
+    city:document.getElementById("f-city").value.trim(),
+    status:document.getElementById("f-status").value,
+    tcp:document.getElementById("f-tcp").value.trim(),
+    reservation:document.getElementById("f-reservation").value.trim(),
+    dp:document.getElementById("f-dp").value.trim(),
+    dpMonths:document.getElementById("f-dp-months").value.trim(),
+    monthlyDp:document.getElementById("f-monthly-dp").value.trim(),
+    monthlyDpLong:document.getElementById("f-monthly-dp-long").value.trim(),
+    dpAll:document.getElementById("f-dp-all").value.trim(),
+    loanable:document.getElementById("f-loanable").value.trim(),
+    term30:document.getElementById("f-term-30").value.trim(),
+    income30:document.getElementById("f-income-30").value.trim(),
+    term25:document.getElementById("f-term-25").value.trim(),
+    income25:document.getElementById("f-income-25").value.trim(),
+    term20:document.getElementById("f-term-20").value.trim(),
+    income20:document.getElementById("f-income-20").value.trim(),
+    term15:document.getElementById("f-term-15").value.trim(),
+    income15:document.getElementById("f-income-15").value.trim(),
+    term10:document.getElementById("f-term-10").value.trim(),
+    income10:document.getElementById("f-income-10").value.trim(),
+    term5:document.getElementById("f-term-5").value.trim(),
+    income5:document.getElementById("f-income-5").value.trim(),
+    beds:document.getElementById("f-beds").value.trim(),
+    toilet:document.getElementById("f-toilet").value.trim(),
+    finish:document.getElementById("f-finish").value,
+    finishDetails:document.getElementById("f-finish-details").value.trim(),
+    lot:document.getElementById("f-lot").value.trim(),
+    floor:document.getElementById("f-floor").value.trim(),
+    block:document.getElementById("f-block").value.trim(),
+    lotNumber:document.getElementById("f-lotnumber").value.trim(),
+    sellingPrice:document.getElementById("f-selling-price").value.trim(),
+    netDp:document.getElementById("f-net-dp").value.trim(),
+    tranche1Period:document.getElementById("f-tranche1-period").value.trim(),
+    tranche1Amount:document.getElementById("f-tranche1-amount").value.trim(),
+    tranche1Add:document.getElementById("f-tranche1-add").value.trim(),
+    tranche2Period:document.getElementById("f-tranche2-period").value.trim(),
+    tranche2Amount:document.getElementById("f-tranche2-amount").value.trim(),
+    tranche2Add:document.getElementById("f-tranche2-add").value.trim(),
+    tranche3:document.getElementById("f-tranche3").value.trim(),
+    highlights:document.getElementById("f-highlights").value.trim(),
+    page:document.getElementById("f-page").value.trim(),
+    contact:document.getElementById("f-contact").value.trim(),
+    sellingPrice:document.getElementById("f-selling-price").value.trim(),
+    netDp:document.getElementById("f-net-dp").value.trim(),
+    tranche1Period:document.getElementById("f-tranche1-period").value.trim(),
+    tranche1Amount:document.getElementById("f-tranche1-amount").value.trim(),
+    tranche1Add:document.getElementById("f-tranche1-add").value.trim(),
+    tranche2Period:document.getElementById("f-tranche2-period").value.trim(),
+    tranche2Amount:document.getElementById("f-tranche2-amount").value.trim(),
+    tranche2Add:document.getElementById("f-tranche2-add").value.trim(),
+    tranche3:document.getElementById("f-tranche3").value.trim(),
+    highlights:document.getElementById("f-highlights").value.trim(),
+    toilet:document.getElementById("f-toilet").value,
+    finishDetails:document.getElementById("f-finish-details").value.trim(),
+    block:document.getElementById("f-block").value.trim(),
+    lotNumber:document.getElementById("f-lotnumber").value.trim(),
+    promo:document.getElementById("f-promo").value.trim(),
+    misc:document.getElementById("f-misc").value.trim(),
+    otherFees:document.getElementById("f-other-fees").value.trim(),
+    page:document.getElementById("f-page").value.trim(),
+    financing:getChips("finChips"),
+    tags:getChips("tagChips"),
+    notes:document.getElementById("f-notes").value.trim(),
+    date:now.toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"}),
+    flagged:false,flagNote:""
+  };
+  const db=loadDB();db.unshift(e);saveDB(db);buildProvFilter();refreshStats();
+  // Auto-push to Google Drive
+  pushToDrive(e, false);
+  document.getElementById("successMsg").style.display="block";
+  showToast("Property submitted by "+e.agent);
+  setTimeout(()=>{
+    document.getElementById("successMsg").style.display="none";
+    ["f-agent","f-source","f-name","f-dev","f-prov","f-city","f-model","f-tcp","f-selling-price","f-net-dp","f-reservation","f-dp","f-dp-months","f-monthly-dp","f-monthly-dp-long","f-dp-all","f-tranche1-period","f-tranche1-amount","f-tranche1-add","f-tranche2-period","f-tranche2-amount","f-tranche2-add","f-tranche3","f-loanable","f-term-30","f-income-30","f-term-25","f-income-25","f-term-20","f-income-20","f-term-15","f-income-15","f-term-10","f-income-10","f-term-5","f-income-5","f-lot","f-floor","f-block","f-lotnumber","f-finish-details","f-page","f-promo","f-misc","f-other-fees","f-highlights","f-notes","f-contact"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+    ["f-type","f-status","f-position","f-beds","f-finish","f-toilet"].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
+    ["f-verlevel","f-type","f-status"].forEach(id=>{document.getElementById(id).selectedIndex=0;});
+    document.querySelectorAll(".chip").forEach(c=>c.classList.remove("selected"));
+    document.getElementById("extractBox").classList.remove("show");
+    document.getElementById("extractPreview").style.display="none";
+    document.querySelectorAll(".ai-filled").forEach(el=>el.classList.remove("ai-filled"));
+  },2500);
+}
+
+function flagEntry(id){
+  const note=prompt("Why are you flagging this entry? (e.g. Price changed, wrong figures)");
+  if(note===null)return;
+  const db=loadDB();const idx=db.findIndex(p=>p.id===id);if(idx<0)return;
+  db[idx].flagged=true;db[idx].flagNote=note||"Needs review";saveDB(db);refreshStats();applySearch();showToast("Entry flagged for review.");
+}
+function unflagEntry(id){const db=loadDB();const idx=db.findIndex(p=>p.id===id);if(idx<0)return;db[idx].flagged=false;db[idx].flagNote="";saveDB(db);refreshStats();applySearch();showToast("Flag removed.");}
+function deleteEntry(id){if(!confirm("Remove this entry?"))return;let db=loadDB();db=db.filter(p=>p.id!==id);saveDB(db);buildProvFilter();refreshStats();applySearch();showToast("Entry deleted.");}
+
+function copyPitch(id,btn){
+  const p=loadDB().find(x=>x.id===id);if(!p)return;
+  const ver=VER[p.verlevel]||VER.reference;
+  function ok(v){return v&&v.trim()&&v!=="TBC"&&!/not shown/i.test(v)&&v!=="0 Bedrooms"&&v!=="0";}
+  function L(label,val){return ok(val)?label+": "+val+"\n":"";}
+
+  const fin=(()=>{const f=p.financing;if(!f)return"";if(Array.isArray(f))return f.join(" / ");return String(f);})();
+  const terms=["30","25","20","15","10","5"].filter(y=>ok(p["term"+y]));
+  const termLines=terms.map(y=>"   "+y+" years: "+p["term"+y]+"/mo"+(ok(p["income"+y])?" | Required income: "+p["income"+y]:"")).join("\n");
+
+  let unitSpecs="";
+  if(ok(p.type)) unitSpecs+=p.type+(ok(p.position)?" ("+p.position+")":"");
+  if(ok(p.beds)) unitSpecs+=" | "+p.beds;
+  if(ok(p.toilet)) unitSpecs+=" | "+p.toilet;
+
+  let areas="";
+  if(ok(p.lot)) areas+="Lot: "+(p.lot.includes("sqm")?p.lot:p.lot+" sqm");
+  if(ok(p.floor)) areas+=(areas?" | ":"")+"Floor: "+(p.floor.includes("sqm")?p.floor:p.floor+" sqm");
+
+  // DP section
+  let dpSection="";
+  if(ok(p.sellingPrice)) dpSection+=L("Selling Price",p.sellingPrice);
+  if(ok(p.tcp)) dpSection+=L("Total Contract Price",p.tcp);
+  if(ok(p.promo)) dpSection+="🎁 Promo: "+p.promo+"\n";
+  if(ok(p.misc)) dpSection+=L("Miscellaneous Fees",p.misc);
+  if(ok(p.reservation)) dpSection+=L("Reservation Fee",p.reservation);
+  if(ok(p.netDp)) dpSection+=L("Net Down Payment",p.netDp);
+  if(ok(p.dp)) dpSection+=L("Down Payment",p.dp);
+  // Tranches
+  if(ok(p.tranche1Period)&&ok(p.tranche1Amount)) dpSection+="  "+p.tranche1Period+": "+p.tranche1Amount+(ok(p.tranche1Add)?" + "+p.tranche1Add:"")+"\n";
+  if(ok(p.tranche2Period)&&ok(p.tranche2Amount)) dpSection+="  "+p.tranche2Period+": "+p.tranche2Amount+(ok(p.tranche2Add)?" + "+p.tranche2Add:"")+"\n";
+  if(ok(p.tranche3)) dpSection+="  "+p.tranche3+"\n";
+  if(!ok(p.tranche1Period)&&ok(p.monthlyDpLong)) dpSection+=L("Monthly DP",p.monthlyDpLong);
+  if(ok(p.loanable)) dpSection+=L("Loanable Amount",p.loanable);
+  if(ok(p.otherFees)) dpSection+=L("Other Fees / HDMF",p.otherFees);
+
+  // Highlights
+  let highlights="";
+  if(ok(p.highlights)){
+    const hLines=p.highlights.split("\n").filter(l=>l.trim());
+    highlights="\n📍 HIGHLIGHTS & NEARBY\n"+hLines.map(l=>"• "+l.trim().replace(/^[•\-\*]\s*/,"")).join("\n")+"\n";
+  }
+
+  var amortLabel2="MONTHLY AMORTIZATION";
+  if(fin.includes("Pag-IBIG")&&fin.includes("Bank")) amortLabel2="MONTHLY AMORTIZATION (Pag-IBIG / Bank)";
+  else if(fin.includes("Pag-IBIG")) amortLabel2="MONTHLY AMORTIZATION — HDMF (Pag-IBIG)";
+  else if(fin.includes("Bank")) amortLabel2="MONTHLY AMORTIZATION — Bank Financing";
+  else if(fin.includes("In-house")) amortLabel2="MONTHLY AMORTIZATION — In-house";
+
+  const t=`📋 PROPERTY COMPUTATION SUMMARY
+${"═".repeat(40)}
+🏠 ${p.name}${ok(p.model)?" — "+p.model:""}${ok(p.position)?" ("+p.position+")":""}
+📍 ${p.city||""}${p.prov?", "+p.prov:""}
+${ok(p.dev)?"🏢 "+p.dev+"\n":""}${unitSpecs?"🏗️ "+unitSpecs+"\n":""}${areas?"📐 "+areas+"\n":""}${ok(p.block)||ok(p.lotNumber)?"🔢 Block & Lot: "+[p.block,p.lotNumber].filter(v=>ok(v)).join(" ")+"\n":""}${ok(p.status)?"📊 "+p.status:""}${fin?" | "+fin:""}
+${"─".repeat(40)}
+💰 COMPUTATION
+${"─".repeat(40)}
+${dpSection}${"─".repeat(40)}
+📅 ${amortLabel2}
+${"─".repeat(40)}
+${termLines||"   Contact us for computation details"}
+${highlights}${"═".repeat(40)}
+✅ ${ver.label} — ${p.agent||"Zonal Realty"} | ${p.date||""}
+📲 For inquiries & tripping — message us!`;
+
+  navigator.clipboard.writeText(t).then(()=>{btn.textContent="Copied!";btn.classList.add("copied");showToast("Computation summary copied!");setTimeout(()=>{btn.textContent="Copy pitch";btn.classList.remove("copied");},2200);});
+}
+
+function exportDB(){
+  const db=loadDB();if(!db.length){showToast("Nothing to export yet.");return;}
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="zonal-property-db-"+new Date().toISOString().split("T")[0]+".json";
+  a.click();showToast("Database exported!");
+}
+
+function importDB(evt){
+  const file=evt.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const imported=JSON.parse(e.target.result);
+      if(!Array.isArray(imported)){showToast("Invalid file format.");return;}
+      const db=loadDB();const existingIds=new Set(db.map(p=>p.id));
+      let added=0;
+      imported.forEach(p=>{if(!existingIds.has(p.id)){db.unshift(p);added++;}});
+      saveDB(db);buildProvFilter();refreshStats();applySearch();
+      showToast(`Imported ${added} new entries. ${imported.length-added} duplicates skipped.`);
+    }catch(err){showToast("Could not read file — check format.");}
+  };
+  reader.readAsText(file);evt.target.value="";
+}
+
+function clearAllConfirm(){if(!confirm("Delete ALL entries from this device? This cannot be undone."))return;saveDB([]);buildProvFilter();refreshStats();applySearch();showToast("Database cleared.");}
+
+function initDriveStatus(){
+  const el=document.getElementById("syncStatusDisplay");if(!el)return;
+  const inp=document.getElementById("gasUrlInput");if(inp)inp.value=GAS_URL;
+  if(GAS_URL&&GAS_URL.includes("script.google.com")){
+    el.innerHTML=`<span style="color:var(--yes);">&#10003; Auto-sync active</span> — entries push to Drive automatically on every submit and update.<br><span style="font-size:11px;color:var(--taupe);">Connected: ${GAS_URL.substring(0,60)}...</span>`;
+  }else{
+    el.innerHTML=`<span style="color:var(--warn);">&#9888; Not configured yet</span> — paste your Apps Script URL in Step 3 above.`;
+  }
+}
+
+// ── DRAG DROP & CLIPBOARD HELPERS ──
+let extractedData={};
+function handleDrop(evt){
+  evt.preventDefault();
+  document.getElementById("uploadZone").classList.remove("dragover");
+  const file=evt.dataTransfer.files[0];
+  if(!file)return;
+  if(!isValidFile(file)){showToast("Please upload an image or PDF file.");return;}
+  processFile(file);
+}
+
+function handleUpdDrop(evt){
+  evt.preventDefault();
+  document.getElementById("updUploadZone").classList.remove("dragover");
+  const file=evt.dataTransfer.files[0];
+  if(!file)return;
+  if(!isValidFile(file)){showToast("Please upload an image or PDF file.");return;}
+  processUpdFile(file);
+}
+
+function isValidFile(file){
+  const ok=["image/jpeg","image/png","image/webp","image/gif","application/pdf"];
+  return ok.includes(file.type)||file.name.toLowerCase().endsWith(".pdf");
+}
+
+// ── MESSENGER REPLY ──
+function copyMessengerReply(id,btn){
+  const p=loadDB().find(x=>x.id===id);if(!p)return;
+  function ok(v){return v&&String(v).trim()&&v!=="TBC"&&!/not shown/i.test(v)&&v!=="0 Bedrooms"&&v!=="0";}
+  function L(label,val){return ok(val)?"• "+label+": "+val+"\n":"";}
+  var NL="\n";
+  var specs="";
+  if(ok(p.type)) specs+="• Type: "+p.type+(ok(p.position)?" ("+p.position+")":"")+NL;
+  if(ok(p.block)||ok(p.lotNumber)) specs+="• Block & Lot: "+[p.block,p.lotNumber].filter(function(v){return ok(v);}).join(" ")+NL;
+  if(ok(p.lot)) specs+="• Lot Area: "+(p.lot.includes("sqm")?p.lot:p.lot+" sqm")+NL;
+  if(ok(p.floor)) specs+="• Floor Area: "+(p.floor.includes("sqm")?p.floor:p.floor+" sqm")+NL;
+  if(ok(p.beds)) specs+="• Bedrooms: "+p.beds+NL;
+  if(ok(p.toilet)) specs+="• Toilet & Bath: "+p.toilet+NL;
+  if(ok(p.finish)) specs+="• Unit Finish: "+p.finish+(ok(p.finishDetails)?" — "+p.finishDetails:"")+NL;
+  var comp="";
+  if(ok(p.sellingPrice)) comp+="• Selling Price: "+p.sellingPrice+NL;
+  if(ok(p.tcp)) comp+="• Total Contract Price (TCP): "+p.tcp+NL;
+  if(ok(p.promo)) comp+="• Promo/Discount: "+p.promo+NL;
+  if(ok(p.misc)) comp+="• Miscellaneous Fees: "+p.misc+NL;
+  if(ok(p.reservation)) comp+="• Reservation Fee: "+p.reservation+NL;
+  if(ok(p.netDp)) comp+="• Net Down Payment: "+p.netDp+NL;
+  if(ok(p.dp)&&!ok(p.netDp)) comp+="• Down Payment: "+p.dp+NL;
+
+  // DP TRANCHES — proper format per line
+  var tranches="";
+  if(ok(p.tranche1Period)&&ok(p.tranche1Amount)){
+    tranches+="• "+p.tranche1Period+": "+p.tranche1Amount+(ok(p.tranche1Add)?" + "+p.tranche1Add:"")+NL;
+    if(ok(p.tranche2Period)&&ok(p.tranche2Amount))
+      tranches+="• "+p.tranche2Period+": "+p.tranche2Amount+(ok(p.tranche2Add)?" + "+p.tranche2Add:"")+NL;
+    if(ok(p.tranche3)) tranches+="• "+p.tranche3+NL;
+  } else if(ok(p.monthlyDp)||ok(p.monthlyDpLong)){
+    // Show as monthly DP lines — NOT as DP Options
+    if(ok(p.monthlyDp)&&ok(p.monthlyDpLong)&&p.monthlyDp!==p.monthlyDpLong){
+      tranches+="• Monthly DP (shortest): "+p.monthlyDp+NL;
+      tranches+="• Monthly DP (longest): "+p.monthlyDpLong+NL;
+    } else {
+      tranches+="• Monthly DP: "+(p.monthlyDpLong||p.monthlyDp)+NL;
+    }
+  } else if(ok(p.dpAll)){
+    // Parse pipe-separated: "6mos: ₱16,567 | 9mos: ₱11,044"
+    p.dpAll.split("|").map(function(s){return s.trim();}).filter(Boolean).forEach(function(part){
+      var clean=part.replace(/(\d+)\s*mos/i,"$1 months");
+      tranches+="• "+clean+NL;
+    });
+  }
+  if(ok(p.dpMonths)&&!tranches) tranches+="• DP Terms available: "+p.dpMonths+NL;
+  if(ok(p.loanable)) comp+="• Loanable Amount: "+p.loanable+NL;
+
+  // MONTHLY AMORTIZATION
+  // Check otherFees for HDMF — extract and add to 30yr if term30 is missing
+  var hdmfFromOther="";
+  if(ok(p.otherFees)&&/hdmf/i.test(p.otherFees)&&!ok(p.term30)){
+    var hdmfMatch=p.otherFees.match(/hdmf[:\s₱]*([0-9,]+(?:\.[0-9]+)?)/i);
+    if(hdmfMatch){
+      hdmfFromOther="₱ "+parseFloat(hdmfMatch[1].replace(/,/g,"")).toLocaleString("en-PH",{minimumFractionDigits:2});
+    }
+  }
+
+  var terms=["30","25","20","15","10","5"].filter(function(y){return ok(p["term"+y]);});
+  // If no terms but HDMF found in otherFees — add it as 30yr
+  if(terms.length===0&&hdmfFromOther) terms=["30_hdmf"];
+  var amorts="";
+  terms.forEach(function(y){
+    if(y==="30_hdmf"){
+      amorts+="• 30 years: "+hdmfFromOther+NL;
+      if(ok(p.income30)) amorts.replace(NL,"")+" (min. income: "+p.income30+")"+NL;
+    } else {
+      amorts+="• "+y+" years: "+p["term"+y]+"/mo";
+      if(ok(p["income"+y])) amorts+=" (min. income: "+p["income"+y]+")";
+      amorts+=NL;
+    }
+  });
+  // If required income is given separately (income30) but no term30 label
+  if(!amorts&&ok(p.income30)&&hdmfFromOther){
+    amorts+="• 30 years: "+hdmfFromOther+" (min. income: "+p.income30+")"+NL;
+  }
+
+  // OTHER FEES — exclude HDMF since it's now in amortization section
+  var otherRaw=ok(p.otherFees)?p.otherFees:"";
+  var otherFees="";
+  if(otherRaw){
+    // Remove HDMF portion if it was moved to amortization
+    var cleaned=otherRaw.replace(/hdmf[:\s₱0-9,.\s]+/gi,"").replace(/\|{2,}/g,"|").replace(/^\||\|$/g,"").trim();
+    if(cleaned&&cleaned!=="|") otherFees="• "+cleaned+NL;
+  }
+
+  // HIGHLIGHTS — bullet form, one per line
+  var highlights="";
+  if(ok(p.highlights)){
+    var hLines=p.highlights.split("\n").filter(function(l){return l.trim();});
+    highlights=hLines.map(function(l){
+      var clean=l.trim().replace(/^[•\-\*]\s*/,"");
+      return "• "+clean;
+    }).join("\n");
+  }
+  // Also check notes for landmark-style content if highlights is empty
+  if(!highlights&&ok(p.notes)&&(p.notes.includes("min")||p.notes.includes("km")||p.notes.includes("near")||p.notes.includes("malapit"))){
+    var nLines=p.notes.split(".").filter(function(l){return l.trim()&&(l.includes("min")||l.includes("km")||l.includes("near")||l.includes("malapit"));});
+    if(nLines.length>0) highlights=nLines.map(function(l){return "• "+l.trim();}).join("\n");
+  }
+  var fin=(function(){var f=p.financing;if(!f)return"";if(Array.isArray(f))return f.join(" / ");return String(f);})();
+  var amortLabel="MONTHLY AMORTIZATION";
+  if(fin.includes("Pag-IBIG")&&fin.includes("Bank")) amortLabel="MONTHLY AMORTIZATION (Pag-IBIG / Bank)";
+  else if(fin.includes("Pag-IBIG")) amortLabel="MONTHLY AMORTIZATION — HDMF (Pag-IBIG)";
+  else if(fin.includes("Bank")) amortLabel="MONTHLY AMORTIZATION — Bank Financing";
+  else if(fin.includes("In-house")) amortLabel="MONTHLY AMORTIZATION — In-house";
+  else if(fin.includes("Cash")) amortLabel="PAYMENT SCHEDULE";
+  var msg="Hi! Thank you for your interest \ud83d\ude0a\n\n";
+  msg+="Here are the details for *"+p.name+(ok(p.model)?" — "+p.model:"")+"*:\n\n";
+  msg+="\ud83d\udccd *LOCATION*\n"+(p.city||"")+(p.prov?", "+p.prov:"")+"\n";
+  if(specs) msg+="\n\ud83c\udfe0 *UNIT SPECS*\n"+specs;
+  if(comp||tranches){
+    msg+="\n\ud83d\udcb0 *COMPUTATION*\n"+comp;
+    if(tranches) msg+="\n\ud83d\udcc5 *DP BREAKDOWN*\n"+tranches;
+  }
+  if(amorts) msg+="\n\ud83d\udcca *"+amortLabel+"*\n"+amorts;
+  if(otherFees) msg+="\n\ud83d\udcb3 *OTHER FEES*\n"+otherFees;
+  if(fin) msg+="\n\ud83d\udcb3 *FINANCING*: "+fin+"\n";
+  if(highlights) msg+="\n\ud83d\udccd *HIGHLIGHTS & NEARBY*\n"+highlights+"\n";
+  msg+="\n\u26a0\ufe0f Prices are subject to change without prior notice.";
+  msg+="\n\nFor site tripping and reservations, message us anytime! \ud83d\ude0a";
+  navigator.clipboard.writeText(msg).then(function(){
+    btn.textContent="Copied!";
+    btn.style.background="var(--yesbg)";
+    btn.style.color="var(--yes)";
+    showToast("Messenger reply copied — paste in chat!");
+    setTimeout(function(){btn.textContent="\ud83d\udcac Messenger";btn.style.background="";btn.style.color="var(--blue)";},2200);
+  });
+}
+function compareUnits(id){
+  const db=loadDB();
+  const p=db.find(x=>x.id===id);
+  if(!p){showToast("Property not found.");return;}
+
+  // Find related units — same project name (base) and developer
+  const baseName=p.name.replace(/\s*—\s*(Carnation|Jasmine|Linnea|Inner|End|Corner|Middle|Unit\s*\w+)/i,"").trim();
+  const related=db.filter(x=>
+    x.id!==p.id&&x.dev===p.dev&&x.city===p.city&&
+    (x.name.toLowerCase().includes(baseName.toLowerCase())||
+     baseName.toLowerCase().includes(x.name.replace(/\s*—.*/,"").toLowerCase().trim()))
+  );
+
+  const units=[p,...related].slice(0,4);
+
+  document.getElementById("compareTitle").textContent="Compare: "+baseName;
+
+  const rows=[
+    ["Model/Position", u=>`<strong>${u.model||u.name}</strong>${u.position?" <br><span style='font-size:11px;color:var(--taupe);'>"+u.position+"</span>":""}`],
+    ["Type", u=>u.type||"—"],
+    ["Lot Area", u=>u.lot?(u.lot.includes("sqm")?u.lot:u.lot+" sqm"):"—"],
+    ["Floor Area", u=>u.floor?(u.floor.includes("sqm")?u.floor:u.floor+" sqm"):"—"],
+    ["Bedrooms", u=>u.beds||"—"],
+    ["TCP", u=>`<strong style='color:var(--brown);'>${u.tcp||"—"}</strong>`],
+    ["Reservation Fee", u=>u.reservation||"—"],
+    ["Down Payment", u=>u.dp||"—"],
+    ["Monthly DP", u=>u.monthlyDp||"—"],
+    ["Loanable Amount", u=>u.loanable||"—"],
+    ["Misc Fees", u=>u.misc||"—"],
+    ["Promo", u=>u.promo?`<span style='color:var(--yes);font-weight:500;'>${u.promo}</span>`:"—"],
+    ["30 yrs / mo", u=>u.term30||"—"],
+    ["30 yrs income", u=>u.income30||"—"],
+    ["25 yrs / mo", u=>u.term25||"—"],
+    ["25 yrs income", u=>u.income25||"—"],
+    ["20 yrs / mo", u=>u.term20||"—"],
+    ["20 yrs income", u=>u.income20||"—"],
+    ["15 yrs / mo", u=>u.term15||"—"],
+    ["15 yrs income", u=>u.income15||"—"],
+    ["10 yrs / mo", u=>u.term10||"—"],
+    ["5 yrs / mo", u=>u.term5||"—"],
+    ["Status", u=>u.status||"—"],
+    ["Financing", u=>(()=>{const f=u.financing;if(!f)return"—";if(Array.isArray(f))return f.join(", ");return String(f);})()],
+  ];
+
+  const colWidth=Math.floor(80/units.length);
+  let html=`<div style="overflow-x:auto;">
+  <table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <thead>
+      <tr style="background:var(--dark);color:white;">
+        <th style="padding:8px 10px;text-align:left;width:20%;font-size:11px;">Field</th>
+        ${units.map(u=>`<th style="padding:8px 10px;text-align:center;width:${colWidth}%;font-size:11px;">${u.model||u.name}<br><span style='font-weight:400;font-size:10px;opacity:.7;'>${u.position||u.type||""}</span></th>`).join("")}
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map(([label,fn],i)=>`
+      <tr style="background:${i%2===0?"var(--cream)":"var(--warm)"};">
+        <td style="padding:6px 10px;color:var(--taupe);font-size:11px;font-weight:500;">${label}</td>
+        ${units.map(u=>`<td style="padding:6px 10px;text-align:center;">${fn(u)}</td>`).join("")}
+      </tr>`).join("")}
+    </tbody>
+  </table></div>`;
+
+  if(units.length===1){
+    html+=`<div style="margin-top:1rem;padding:.75rem 1rem;background:var(--warnbg);border-radius:8px;font-size:12px;color:var(--warn);">
+    &#9888; Only one unit found for this project. Add Inner, End, and Corner entries separately to compare them side by side.
+    </div>`;
+  }
+
+  document.getElementById("compareContent").innerHTML=html;
+  document.getElementById("compareModal").classList.add("open");
+  document.body.style.overflow="hidden";
+  window._compareUnits=units;
+}
+
+function copyCompare(){
+  const units=window._compareUnits||[];
+  if(!units.length)return;
+  const rows=[
+    ["Model", u=>u.model||u.name],
+    ["Position", u=>u.position||"—"],
+    ["Lot Area", u=>u.lot||(u.lot+" sqm")||"—"],
+    ["Floor Area", u=>u.floor||(u.floor+" sqm")||"—"],
+    ["TCP", u=>u.tcp||"—"],
+    ["Reservation", u=>u.reservation||"—"],
+    ["DP", u=>u.dp||"—"],
+    ["Monthly DP", u=>u.monthlyDp||"—"],
+    ["Loanable", u=>u.loanable||"—"],
+    ["Misc Fees", u=>u.misc||"—"],
+    ["30yrs/mo", u=>u.term30||"—"],
+    ["30yrs income", u=>u.income30||"—"],
+    ["25yrs/mo", u=>u.term25||"—"],
+    ["20yrs/mo", u=>u.term20||"—"],
+    ["15yrs/mo", u=>u.term15||"—"],
+  ];
+  const header="UNIT COMPARISON — "+(units[0].name||"").replace(/\s*—.*/,"")+"\n"+"=".repeat(50)+"\n";
+  const cols=["Field",...units.map(u=>u.model||u.position||u.name)];
+  const colW=14;
+  const pad=(s,w)=>(s||"").substring(0,w).padEnd(w);
+  let text=header;
+  text+=cols.map(c=>pad(c,colW)).join(" | ")+"\n";
+  text+="-".repeat(colW*cols.length+cols.length*3)+"\n";
+  rows.forEach(([label,fn])=>{
+    text+=pad(label,colW)+" | "+units.map(u=>pad(fn(u),colW)).join(" | ")+"\n";
+  });
+  text+="\n✅ Zonal Realty PH — message us for tripping!";
+  navigator.clipboard.writeText(text).then(()=>showToast("Comparison copied!"));
+}
+function openRawTextPaste(){
+  document.getElementById("rawTextInput").value="";
+  document.getElementById("rawParseResult").style.display="none";
+  document.getElementById("rawTextModal").classList.add("open");
+  document.body.style.overflow="hidden";
+  setTimeout(()=>{
+    const ta=document.getElementById("rawTextInput");
+    ta.focus();
+    // Ctrl+Enter shortcut to parse
+    ta.onkeydown=function(e){
+      if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();parseRawText();}
+    };
+  },100);
+}
+function closeRawTextModal(){
+  document.getElementById("rawTextModal").classList.remove("open");
+  document.body.style.overflow="";
+}
+
+function parseRawText(){
+  const raw=document.getElementById("rawTextInput").value.trim();
+  if(!raw){showToast("Please paste some text first.");return;}
+
+  // ── PESO amount extractor ──
+  function findPeso(patterns){
+    for(const pat of patterns){
+      const m=raw.match(pat);
+      if(m){
+        const num=m[1].replace(/[^\d.]/g,"");
+        const n=parseFloat(num);
+        if(!isNaN(n)&&n>0){
+          // Format with commas
+          return "₱ "+Math.round(n).toLocaleString("en-PH");
+        }
+      }
+    }
+    return "";
+  }
+
+  // ── NUMBER extractor (raw digits) ──
+  function findNum(patterns){
+    for(const pat of patterns){
+      const m=raw.match(pat);
+      if(m) return m[1].trim();
+    }
+    return "";
+  }
+
+  // ── TEXT extractor ──
+  function findText(patterns){
+    for(const pat of patterns){
+      const m=raw.match(pat);
+      if(m) return m[1].trim();
+    }
+    return "";
+  }
+
+  const filled={};
+
+  // House Model
+  const model=findText([/model[:\s]+([^\n]+)/i,/unit type[:\s]+([^\n]+)/i,/unit[:\s]+([^\n,]+)/i]);
+  if(model){document.getElementById("f-model").value=model;filled["House model"]=model;}
+
+  // Project name
+  const name=findText([/project[:\s]+([^\n]+)/i,/name[:\s]+([^\n,]+)/i,/^([A-Z][^\n]{5,40}(?:Homes|Residences|Place|Enclave|Village|Estate|Tower|Suites|Court))/im]);
+  if(name){document.getElementById("f-name").value=name;filled["Project name"]=name;}
+
+  // Developer
+  const dev=findText([/developer[:\s]+([^\n]+)/i,/by[:\s]+([^\n]+)/i,/corp[:\s]*([^\n]+)/i]);
+  if(dev){document.getElementById("f-dev").value=dev;filled["Developer"]=dev;}
+
+  // Province
+  const provs=["Cavite","Batangas","Laguna","Rizal","Bulacan","Pampanga","Tarlac","Cebu","Iloilo","Davao","Bataan","Zambales","Pangasinan"];
+  for(const p of provs){if(raw.match(new RegExp(p,"i"))){document.getElementById("f-prov").value=p;filled["Province"]=p;break;}}
+
+  // City
+  const city=findText([/city[:\s]+([^\n,]+)/i,/municipality[:\s]+([^\n,]+)/i,/location[:\s]+([^\n,]+)/i,/(?:in|at)\s+([A-Z][a-z]+(?:\s[A-Z][a-z]+)?),\s*(?:Cavite|Batangas|Laguna)/i]);
+  if(city){document.getElementById("f-city").value=city.replace(/,.*$/,"").trim();filled["City"]=city;}
+
+  // TCP
+  const tcp=findPeso([/tcp[:\s₱]*([0-9,. ]+)/i,/total contract price[:\s₱]*([0-9,. ]+)/i,/selling price[:\s₱]*([0-9,. ]+)/i,/price[:\s₱]*([0-9,. ]+)/i,/₱\s*([0-9,]+(?:\.[0-9]+)?)\s*(?:tcp|total)/i]);
+  if(tcp){document.getElementById("f-tcp").value=tcp;filled["TCP"]=tcp;}
+
+  // Reservation fee
+  const res=findPeso([/reservation fee[:\s₱]*([0-9,. ]+)/i,/reservation[:\s₱]*([0-9,. ]+)/i,/rf[:\s₱]*([0-9,. ]+)/i]);
+  if(res){document.getElementById("f-reservation").value=res;filled["Reservation fee"]=res;}
+
+  // Down payment
+  const dp=findText([/dp[:\s]+([^\n]+)/i,/down payment[:\s]+([^\n]+)/i,/downpayment[:\s]+([^\n]+)/i]);
+  if(dp){document.getElementById("f-dp").value=dp;filled["Down payment"]=dp;}
+
+  // DP months
+  // DP Months
+  const dpMo=findText([/(?:dp|down payment).*?spread.*?(\d+)\s*months?/i,/(\d+)\s*months?\s*(?:to pay|payment|spread)/i,/dp.*?(\d+)\s*mos?/i,/dp payable[:\s]+([^\n]+)/i]);
+  if(dpMo){document.getElementById("f-dp-months").value=dpMo.includes("month")?dpMo:dpMo+" months";filled["DP months"]=dpMo;}
+
+  // Loanable
+  const loan=findPeso([
+    /loanable\s*amount[:\s]*₱\s*([\d,]+(?:\.\d+)?)/i,
+    /loanable[:\s]*₱\s*([\d,]+(?:\.\d+)?)/i,
+    /loan\s*amount[:\s]*₱\s*([\d,]+(?:\.\d+)?)/i,
+    /hdmf\s*loan[:\s]*₱\s*([\d,]+(?:\.\d+)?)/i,
+    /loanable\s*amount[:\s₱]*([0-9,. ]+)/i,
+    /loanable[:\s₱]*([0-9,. ]+)/i
+  ]);
+  if(loan){document.getElementById("f-loanable").value=loan;filled["Loanable"]=loan;}
+
+  // DP Months — collect all available terms
+  const lines = raw.split('\n');
+  const dpMonthLines = lines.filter(l => l.match(/monthly\s*dp|monthly\s*down|monthly\s*equity/i));
+  const dpTerms = [];
+  let shortestTerm = 999, longestTerm = 0;
+  let shortestVal = "", longestVal = "";
+
+  dpMonthLines.forEach(l => {
+    const moMatch = l.match(/\((\d+)\s*months?\)/i) || l.match(/(\d+)\s*(?:mos?|months?)/i);
+    const pesoMatch = l.match(/₱\s*([\d,]+(?:\.\d+)?)/);
+    if (moMatch && pesoMatch) {
+      const mo = parseInt(moMatch[1]);
+      const n = parseFloat(pesoMatch[1].replace(/,/g,""));
+      if (!isNaN(n) && n > 0) {
+        const val = "₱ " + Math.round(n).toLocaleString("en-PH");
+        dpTerms.push(`${mo}mos: ${val}`);
+        if (mo < shortestTerm) { shortestTerm = mo; shortestVal = val; }
+        if (mo > longestTerm)  { longestTerm  = mo; longestVal  = val; }
+      }
+    }
+  });
+
+  if (dpTerms.length > 0) {
+    // All DP options
+    document.getElementById("f-dp-all").value = dpTerms.join(" | ");
+    filled["All DP terms"] = dpTerms.join(" | ");
+    // DP months available
+    const moList = dpTerms.map(t => t.split("mos:")[0].trim()).join(", ");
+    document.getElementById("f-dp-months").value = moList + " months";
+    filled["DP months"] = moList + " months";
+    // Shortest term (RFO — highest monthly)
+    if (shortestVal) { document.getElementById("f-monthly-dp").value = shortestVal + " / " + shortestTerm + " mos"; filled["Monthly DP (shortest)"] = shortestVal; }
+    // Longest term (NRFO — lowest monthly) ← most buyer-friendly
+    if (longestVal)  { document.getElementById("f-monthly-dp-long").value = longestVal + " / " + longestTerm + " mos"; filled["Monthly DP (longest)"] = longestVal; }
+  } else {
+    // Fallback for simple "Monthly DP: ₱ xxx" format
+    const mdpFallback = findPeso([/monthly dp[:\s₱]*([0-9,. ]+)/i,/monthly down[:\s₱]*([0-9,. ]+)/i,/monthly equity[:\s₱]*([0-9,. ]+)/i]);
+    if (mdpFallback) { document.getElementById("f-monthly-dp").value = mdpFallback; filled["Monthly DP"] = mdpFallback; }
+  }
+
+  // Loan terms — monthly amort + required income
+  const termYears = ["30","25","20","15","10","5"];
+
+  termYears.forEach(yr => {
+    // Find the line containing this term — use word boundary to prevent "5" matching "25"
+    const termLine = lines.find(l => {
+      // Must start with the year number (with optional whitespace)
+      return l.match(new RegExp(`^\\s*${yr}\\s*(?:years?|yrs?)`, 'i')) ||
+             l.match(new RegExp(`(?:^|\\s)${yr}\\s*(?:years?|yrs?)\\s*monthly`, 'i')) ||
+             l.match(new RegExp(`(?:^|\\s)${yr}\\s*(?:years?|yrs?)\\s*[—\\-]`, 'i'));
+    });
+    if (!termLine) return;
+
+    // Extract amortization — match ₱ followed by optional space then digits
+    const amortMatch = termLine.match(/:\s*₱\s*([\d,]+(?:\.\d+)?)/);
+    if (amortMatch) {
+      const n = parseFloat(amortMatch[1].replace(/,/g,""));
+      if (!isNaN(n) && n > 100 && n < 500000) {
+        const val = "₱ " + Math.round(n).toLocaleString("en-PH");
+        const el = document.getElementById("f-term-"+yr);
+        if (el && !el.value) { el.value = val; filled[yr+"yr amort"] = val; }
+      }
+    }
+
+    // Extract required income — after "income" keyword
+    const incomeMatch = termLine.match(/income[:\s]*₱\s*([\d,]+(?:\.\d+)?)/i) ||
+                        termLine.match(/—\s*₱\s*([\d,]+(?:\.\d+)?)\s*$/i);
+    if (incomeMatch) {
+      const n = parseFloat(incomeMatch[1].replace(/,/g,""));
+      if (!isNaN(n) && n > 100) {
+        const val = "₱ " + Math.round(n).toLocaleString("en-PH");
+        const el = document.getElementById("f-income-"+yr);
+        if (el && !el.value) { el.value = val; filled[yr+"yr income"] = val; }
+      }
+    }
+  });
+
+  // Lot area
+  const lot=findText([/lot\s*area[:\s]*([0-9,.]+\s*sqm?)/i,/lot[:\s]*([0-9,.]+\s*sqm?)/i,/([0-9,.]+)\s*sqm?\s*(?:lot)/i]);
+  if(lot){document.getElementById("f-lot").value=lot.includes("sqm")?lot:lot+" sqm";filled["Lot area"]=lot;}
+
+  // Floor area
+  const floor=findText([/floor\s*area[:\s]*([0-9,.]+\s*sqm?)/i,/floor[:\s]*([0-9,.]+\s*sqm?)/i,/([0-9,.]+)\s*sqm?\s*(?:floor|fa)/i]);
+  if(floor){document.getElementById("f-floor").value=floor.includes("sqm")?floor:floor+" sqm";filled["Floor area"]=floor;}
+
+  // Bedrooms
+  const beds=findText([/(\d+)\s*(?:br|bedroom|bedrooms|bed)/i,/(?:br|bedroom)[:\s]*(\d+)/i]);
+  if(beds){document.getElementById("f-beds").value=beds+(beds.match(/br/i)?"":"-BR");filled["Bedrooms"]=beds;}
+
+  // Misc fees
+  const misc=findPeso([/misc(?:ellaneous)?\s*fee[s]?[:\s₱]*([0-9,. ]+)/i,/miscfee[:\s₱]*([0-9,. ]+)/i]);
+  if(misc){document.getElementById("f-misc").value=misc;filled["Misc fees"]=misc;}
+
+  // Promo
+  const promo=findText([/promo[:\s]+([^\n]+)/i,/discount[:\s]+([^\n]+)/i,/special offer[:\s]+([^\n]+)/i,/free\s+([^\n]+)/i]);
+  if(promo){document.getElementById("f-promo").value=promo;filled["Promo"]=promo;}
+
+  // Status
+  if(/\brfo\b/i.test(raw)||/ready for occupanc/i.test(raw)){document.getElementById("f-status").value="RFO";filled["Status"]="RFO";}
+  else if(/pre.?sell/i.test(raw)){document.getElementById("f-status").value="Pre-Selling";filled["Status"]="Pre-Selling";}
+  else if(/ongoing|under construction/i.test(raw)){document.getElementById("f-status").value="Ongoing Construction";filled["Status"]="Ongoing Construction";}
+
+  // Financing chips
+  const finMap={"Pag-IBIG":/pag.?ibig|hdmf/i,"Bank":/bank\s*(?:loan|financing)/i,"In-house":/in.?house/i,"Cash":/cash/i};
+  document.querySelectorAll("#finChips .chip").forEach(c=>{
+    const reg=finMap[c.dataset.val];
+    if(reg&&reg.test(raw)){c.classList.add("selected");filled["Financing: "+c.dataset.val]=true;}
+  });
+
+  // Show result
+  const count=Object.keys(filled).length;
+  const resultEl=document.getElementById("rawParseResult");
+  if(count===0){
+    resultEl.style.display="block";
+    resultEl.style.background="var(--nobg)";
+    resultEl.style.color="var(--no)";
+    resultEl.innerHTML="&#9888; Could not extract any figures. Check that your text includes peso amounts, sqm values, or loan terms.";
+  } else {
+    resultEl.style.display="block";
+    resultEl.style.background="var(--yesbg)";
+    resultEl.style.color="var(--yes)";
+    resultEl.innerHTML="&#10003; <strong>"+count+" fields filled</strong><br>"+
+      Object.entries(filled).filter(([,v])=>v!==true).map(([k,v])=>`${k}: ${v}`).join("<br>");
+    setTimeout(()=>{closeRawTextModal();showToast(count+" fields filled — review and submit.");},1800);
+  }
+}
+
+async function pasteFromClipboard(){
+  try{
+    const items=await navigator.clipboard.read();
+    for(const item of items){
+      const imgType=item.types.find(t=>t.startsWith("image/"));
+      if(imgType){const blob=await item.getType(imgType);const file=new File([blob],"pasted."+imgType.split("/")[1],{type:imgType});processFile(file);return;}
+    }
+    // No image — open raw text paste instead
+    openRawTextPaste();
+  }catch(e){openRawTextPaste();}
+}
+
+async function pasteUpdFromClipboard(){
+  try{
+    const items=await navigator.clipboard.read();
+    for(const item of items){
+      const imgType=item.types.find(t=>t.startsWith("image/"));
+      if(imgType){const blob=await item.getType(imgType);const file=new File([blob],"pasted."+imgType.split("/")[1],{type:imgType});processUpdFile(file);return;}
+    }
+    showToast("No image found in clipboard.");
+  }catch(e){showToast("Clipboard access denied. Use Browse Files instead.");}
+}
+
+function handleImageUpload(evt){
+  const file=evt.target.files[0];if(!file)return;
+  processFile(file);
+}
+
+async function processFile(file){
+  const box=document.getElementById("extractBox");
+  const statusEl=document.getElementById("extractStatus");
+  const preview=document.getElementById("extractPreview");
+  const fieldsEl=document.getElementById("extractFields");
+  const applyBtn=document.getElementById("applyBtn");
+  box.classList.add("show");
+  statusEl.className="extract-status reading";
+  statusEl.textContent=file.type==="application/pdf"?"Reading PDF...":"Reading image...";
+  if(file.type!=="application/pdf"){preview.style.display="block";preview.src=URL.createObjectURL(file);}
+  else{preview.style.display="none";}
+  fieldsEl.innerHTML="";applyBtn.disabled=true;extractedData={};
+
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    const b64=e.target.result.split(",")[1];
+    const mime=file.type||"image/jpeg";
+    const isPDF=mime==="application/pdf";
+    try{
+      let extracted={};
+
+      if(GAS_URL){
+        // Route through GAS proxy — works from Netlify, no CORS issues
+        statusEl.textContent=isPDF?"Reading PDF via server...":"Reading image via server...";
+        // Send as JSON body — URLSearchParams has ~50KB limit, images are much larger
+        let resp, text, result;
+        try{
+          resp=await fetch(GAS_URL,{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({action:"extract",imageBase64:b64,imageMime:mime})
+          });
+          text=await resp.text();
+          console.log("GAS response status:",resp.status,"body:",text.substring(0,200));
+        }catch(fetchErr){
+          statusEl.className="extract-status error";
+          statusEl.textContent="Cannot reach Apps Script: "+fetchErr.message+" — check Test Connection in Drive Sync tab.";
+          return;
+        }
+        try{result=JSON.parse(text);}
+        catch(pe){
+          statusEl.className="extract-status error";
+          statusEl.textContent="GAS returned unexpected response: "+text.substring(0,150);
+          return;
+        }
+        if(result.ok&&result.data){
+          extracted=result.data;
+        }else{
+          statusEl.className="extract-status error";
+          statusEl.textContent="❌ "+(result.error||"Extraction failed — no data returned. Check your API key in Apps Script.");
+          console.error("GAS error:",result);
+          return;
+        }
+      } else {
+        // Fallback: direct Anthropic call (only works locally, not on Netlify)
+        statusEl.textContent="Reading directly (local mode)...";
+        const EXTRACT_PROMPT=`Extract Philippine real estate pricing figures. Return ONLY a JSON object: {"project_name":"","developer":"","province":"","city":"","tcp":"","reservation_fee":"","down_payment":"","dp_months":"","monthly_amortization":"","loanable_amount":"","term_30":"","income_30":"","term_25":"","income_25":"","term_20":"","income_20":"","term_15":"","income_15":"","term_10":"","income_10":"","term_5":"","income_5":"","bedrooms":"","lot_area":"","floor_area":"","status":"","financing":"","promo":"","misc_fees":""}. Return ONLY valid JSON.`;
+        const msgContent=isPDF
+          ?[{type:"document",source:{type:"base64",media_type:"application/pdf",data:b64}},{type:"text",text:EXTRACT_PROMPT}]
+          :[{type:"image",source:{type:"base64",media_type:mime,data:b64}},{type:"text",text:EXTRACT_PROMPT}];
+        const resp=await fetch("https://api.anthropic.com/v1/messages",{
+          method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1200,messages:[{role:"user",content:msgContent}]})
+        });
+        const data=await resp.json();
+        const raw=(data.content&&data.content[0]&&data.content[0].text)||"{}";
+        try{extracted=JSON.parse(raw.replace(/```json|```/g,"").trim());}catch(pe){extracted={};}
+      }
+
+      extractedData=extracted;
+      const display=[
+        ["Project name",extractedData.project_name],["Developer",extractedData.developer],
+        ["Province",extractedData.province],["City",extractedData.city],
+        ["TCP",extractedData.tcp],["Reservation fee",extractedData.reservation_fee],
+        ["Down payment",extractedData.down_payment],["DP months",extractedData.dp_months],
+        ["Monthly amortization",extractedData.monthly_amortization],["Loanable",extractedData.loanable_amount],
+        ["30yr amort",extractedData.term_30],["30yr income",extractedData.income_30],
+        ["25yr amort",extractedData.term_25],["25yr income",extractedData.income_25],
+        ["20yr amort",extractedData.term_20],["20yr income",extractedData.income_20],
+        ["15yr amort",extractedData.term_15],["15yr income",extractedData.income_15],
+        ["10yr amort",extractedData.term_10],["10yr income",extractedData.income_10],
+        ["5yr amort",extractedData.term_5],["5yr income",extractedData.income_5],
+        ["Bedrooms",extractedData.bedrooms],["Lot area",extractedData.lot_area],
+        ["Floor area",extractedData.floor_area],["Status",extractedData.status],
+        ["Financing",extractedData.financing],["Promo",extractedData.promo],
+        ["Misc fees",extractedData.misc_fees]
+      ];
+      const found=display.filter(([,v])=>v&&v.trim());
+      if(!found.length){statusEl.className="extract-status error";statusEl.textContent="Could not extract figures — try a clearer image or typed PDF.";return;}
+      fieldsEl.innerHTML=found.map(([l,v])=>`<div class="ef-row"><span class="el">${l}</span><span class="ev">${v}</span></div>`).join("");
+      statusEl.className="extract-status done";statusEl.textContent=`✓ ${found.length} fields extracted from ${isPDF?"PDF":"image"}`;
+      applyBtn.disabled=false;
+    }catch(err){
+      statusEl.className="extract-status error";
+      statusEl.textContent="Extraction failed — check your connection and try again.";
+      console.error(err);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function processUpdFile(file){
+  // Trigger the update modal's extraction with this file
+  const fakeEvt={target:{files:[file]}};
+  handleUpdImage(fakeEvt);
+}
+
+function applyExtracted(){
+  const map={
+    "f-name":"project_name","f-dev":"developer","f-prov":"province",
+    "f-city":"city","f-tcp":"tcp","f-reservation":"reservation_fee",
+    "f-monthly-dp":"monthly_amortization","f-dp":"down_payment",
+    "f-loanable":"loanable_amount","f-beds":"bedrooms","f-lot":"lot_area",
+    "f-floor":"floor_area","f-dp-months":"dp_months",
+    "f-term-30":"term_30","f-income-30":"income_30",
+    "f-term-25":"term_25","f-income-25":"income_25",
+    "f-term-20":"term_20","f-income-20":"income_20",
+    "f-term-15":"term_15","f-income-15":"income_15",
+    "f-term-10":"term_10","f-income-10":"income_10",
+    "f-term-5":"term_5","f-income-5":"income_5",
+    "f-promo":"promo","f-misc":"misc_fees"
+  };
+  Object.entries(map).forEach(([fieldId,key])=>{
+    const val=extractedData[key];
+    if(val&&val.trim()){
+      const el=document.getElementById(fieldId);
+      if(el){el.value=val;el.classList.add("ai-filled");}
+    }
+  });
+  if(extractedData.status){
+    const sel=document.getElementById("f-status");
+    [...sel.options].forEach(o=>{if(o.value&&extractedData.status.toLowerCase().includes(o.value.toLowerCase()))sel.value=o.value;});
+  }
+  showToast("Figures applied — review and adjust if needed.");
+}
+
+async function syncToDrive(){
+  const db=loadDB();if(!db.length){showToast("Nothing to sync.");return;}
+  const statusEl=document.getElementById("driveStatus");
+  const rootFolder=document.getElementById("driveFolder").value.trim()||"Zonal Realty Property Database";
+  statusEl.className="drive-status loading";statusEl.textContent=`Syncing ${db.length} entries to Google Drive...`;
+  showToast("Drive sync requires Google Drive MCP. See instructions below.");
+  statusEl.className="drive-status err";
+  statusEl.textContent=`To sync: Export your database (Search tab → Export), then upload the JSON to your Google Drive folder "${rootFolder}/[Province]/[City]/". Or connect the Google Drive MCP in Claude settings for automatic sync.`;
+}
+
+async function pullFromDrive(){
+  const statusEl=document.getElementById("pullStatus");
+  statusEl.className="drive-status err";
+  statusEl.textContent="To pull: Download the JSON file from your team's shared Drive folder, then use Import (Search tab → Import) to merge it into your local database.";
+}
+
+let _updId=null;
+let _updExtracted={};
+
+function openUpdateModal(id){
+  _updId=id;_updExtracted={};
+  const p=loadDB().find(x=>x.id===id);if(!p)return;
+  document.getElementById("modalTitle").textContent="Update: "+p.name;
+  document.getElementById("modalSub").textContent=(p.history&&p.history.length>0?p.history.length+" previous update"+(p.history.length>1?"s":"")+" preserved below":"No updates yet — original entry will be kept in history.");
+  ["upd-agent","upd-source","upd-tcp","upd-reservation","upd-monthly","upd-dp","upd-loanable","upd-term","upd-notes"].forEach(id=>{const el=document.getElementById(id);if(el){el.value="";el.classList.remove("changed");}});
+  document.getElementById("upd-verlevel").selectedIndex=0;
+  document.getElementById("upd-status").selectedIndex=0;
+  document.getElementById("updExtractBox").classList.remove("show");
+  renderHistory(p);
+  document.getElementById("updateModal").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+
+function closeUpdateModal(){
+  document.getElementById("updateModal").classList.remove("open");
+  document.body.style.overflow="";
+  _updId=null;_updExtracted={};
+  if(document.getElementById("updImageInput"))document.getElementById("updImageInput").value="";
+}
+
+function renderHistory(p){
+  const wrap=document.getElementById("historyWrap");
+  const hist=p.history||[];
+  if(!hist.length){wrap.innerHTML=`<div class="history-empty">No updates yet. This is the original entry.</div>`;return;}
+  wrap.innerHTML=[...hist].reverse().map((h,i)=>{
+    const isLatest=i===0;
+    const changes=h.changes||[];
+    return`<div class="hist-entry">
+      <div class="hist-dot" style="${isLatest?"background:var(--gold)":"background:var(--sand2)"}"></div>
+      <div>
+        <div class="hist-meta">${isLatest?"<strong>Latest:</strong> ":""}${h.date} &middot; by ${h.agent} &middot; ${h.verlevel||"—"}</div>
+        ${h.source?`<div class="hist-meta" style="margin-top:1px;">Source: ${h.source}</div>`:""}
+        <div class="hist-changes">
+          ${changes.map(c=>`<span class="hist-chip changed">${c.field}: <s style="opacity:.5">${c.old||"—"}</s> → ${c.new}</span>`).join("")}
+          ${h.notes?`<span class="hist-chip">${h.notes}</span>`:""}
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function handleUpdImage(evt){
+  const file=evt.target.files[0];if(!file)return;
+  const box=document.getElementById("updExtractBox");
+  const statusEl=document.getElementById("updExtractStatus");
+  const fieldsEl=document.getElementById("updExtractFields");
+  const applyBtn=document.getElementById("updApplyBtn");
+  box.classList.add("show");
+  statusEl.className="upd-extract-status reading";statusEl.textContent="Reading image...";
+  fieldsEl.innerHTML="";applyBtn.disabled=true;_updExtracted={};
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    const b64=e.target.result.split(",")[1];const mime=file.type||"image/jpeg";
+    try{
+      const resp=await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:800,messages:[{role:"user",content:[
+          {type:"image",source:{type:"base64",media_type:mime,data:b64}},
+          {type:"text",text:`Extract updated Philippine real estate pricing figures from this image. Return ONLY a JSON object with these keys (leave empty string if not found): {"tcp":"","reservation_fee":"","monthly_amortization":"","down_payment":"","loanable_amount":"","loan_term":"","status":""}. Return ONLY the JSON, nothing else.`}
+        ]}]})
+      });
+      const data=await resp.json();
+      const raw=(data.content&&data.content[0]&&data.content[0].text)||"{}";
+      try{_updExtracted=JSON.parse(raw.replace(/```json|```/g,"").trim());}catch(e){_updExtracted={};}
+      const found=Object.entries(_updExtracted).filter(([,v])=>v&&v.trim());
+      if(!found.length){statusEl.className="upd-extract-status err";statusEl.textContent="Could not extract figures — fill manually.";return;}
+      fieldsEl.innerHTML=found.map(([k,v])=>`<span style="margin-right:6px;display:inline-block;padding:2px 7px;background:var(--goldl);border-radius:6px;color:var(--warn);font-size:10px;margin-bottom:3px;">${k.replace(/_/g," ")}: ${v}</span>`).join("");
+      statusEl.className="upd-extract-status done";statusEl.textContent=`${found.length} figures extracted`;
+      applyBtn.disabled=false;
+    }catch(err){statusEl.className="upd-extract-status err";statusEl.textContent="Extraction failed. Fill fields manually.";}
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyUpdExtracted(){
+  const map={"upd-tcp":"tcp","upd-reservation":"reservation_fee","upd-monthly":"monthly_amortization","upd-dp":"down_payment","upd-loanable":"loanable_amount","upd-term":"loan_term"};
+  Object.entries(map).forEach(([fieldId,key])=>{
+    const val=_updExtracted[key];
+    if(val&&val.trim()){const el=document.getElementById(fieldId);el.value=val;el.classList.add("changed");}
+  });
+  if(_updExtracted.status){const sel=document.getElementById("upd-status");[...sel.options].forEach(o=>{if(o.value&&_updExtracted.status.toLowerCase().includes(o.value.toLowerCase()))sel.value=o.value;});}
+  showToast("Figures applied — review before saving.");
+}
+
+function saveUpdate(){
+  const agent=document.getElementById("upd-agent").value.trim();
+  const verlevel=document.getElementById("upd-verlevel").value;
+  if(!agent){alert("Please enter your name.");return;}
+  if(!verlevel){alert("Please select a verification level.");return;}
+  const db=loadDB();
+  const idx=db.findIndex(p=>p.id===_updId);if(idx<0)return;
+  const p=db[idx];
+  const now=new Date();
+  const dateStr=now.toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"});
+
+  const fields=[
+    {key:"tcp",label:"TCP",id:"upd-tcp"},
+    {key:"reservation",label:"Reservation",id:"upd-reservation"},
+    {key:"monthly",label:"Monthly",id:"upd-monthly"},
+    {key:"dp",label:"Down payment",id:"upd-dp"},
+    {key:"loanable",label:"Loanable",id:"upd-loanable"},
+    {key:"term",label:"Loan term",id:"upd-term"},
+  ];
+
+  const changes=[];
+  fields.forEach(f=>{
+    const newVal=document.getElementById(f.id).value.trim();
+    if(newVal&&newVal!==p[f.key]){
+      changes.push({field:f.label,old:p[f.key]||"",new:newVal});
+      p[f.key]=newVal;
+    }
+  });
+
+  const newStatus=document.getElementById("upd-status").value;
+  if(newStatus&&newStatus!==p.status){changes.push({field:"Status",old:p.status||"",new:newStatus});p.status=newStatus;}
+
+  const updNotes=document.getElementById("upd-notes").value.trim();
+  if(!changes.length&&!updNotes){showToast("No changes detected — nothing saved.");return;}
+
+  if(!p.history)p.history=[];
+  p.history.push({
+    date:dateStr,agent,verlevel,
+    source:document.getElementById("upd-source").value.trim(),
+    notes:updNotes,changes
+  });
+
+  p.verlevel=verlevel;
+  if(document.getElementById("upd-source").value.trim())p.source=document.getElementById("upd-source").value.trim();
+
+  db[idx]=p;saveDB(db);refreshStats();applySearch();
+  // Auto-push updated entry to Drive
+  pushToDrive(p, false);
+  showToast(`Updated by ${agent} — ${changes.length} field${changes.length!==1?"s":""} changed. History preserved.`);
+  closeUpdateModal();
+}
+
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2800);}
+
+// ══════════════════════════════════════
+// GOOGLE APPS SCRIPT DRIVE SYNC
+// ══════════════════════════════════════
+
+// ← PASTE YOUR APPS SCRIPT WEB APP URL HERE after deploying
+// Leave empty to disable auto-sync (manual export still works)
+let GAS_URL = localStorage.getItem("zonal_gas_url") || "https://script.google.com/macros/s/AKfycbwITZ__5n_aEaTgXEpnmKmPcj0pZPugcD8g-Crg1zZikijADLg8H10PZ5EpUDsrESemgA/exec";
+
+async function pushToDrive(entry, silent=false) {
+  if (!GAS_URL) return { ok: false, error: "No Apps Script URL configured" };
+  try {
+    // GAS requires form-encoded POST or GET params — JSON POST with Content-Type
+    // triggers CORS preflight which GAS blocks from local HTML files.
+    // Solution: send as application/x-www-form-urlencoded (no preflight)
+    const body = new URLSearchParams({
+      action: "save",
+      entry: JSON.stringify(entry)
+    });
+    const resp = await fetch(GAS_URL, {
+      method: "POST",
+      body: body
+      // No Content-Type header — browser sets it automatically as form-urlencoded
+      // No 'no-cors' — we need to read the response to confirm success
+    });
+    const text = await resp.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) { data = { ok: false, error: "Invalid response: " + text.substring(0,100) }; }
+    if (!silent) {
+      if (data.ok) {
+        showToast(`✓ Saved to Drive: ${data.folder || entry.prov + "/" + entry.city}`);
+      } else {
+        showToast(`Drive sync failed: ${data.error || "Unknown error"}`);
+      }
+    }
+    return data;
+  } catch (err) {
+    if (!silent) showToast("Drive sync error — saved locally only. Check console for details.");
+    console.error("pushToDrive error:", err);
+    return { ok: false, error: err.message };
+  }
+}
+
+async function pingDrive() {
+  const url = document.getElementById("gasUrlInput").value.trim();
+  const statusEl = document.getElementById("gasStatus");
+  if (!url) { statusEl.className = "drive-status err"; statusEl.textContent = "Please paste your Apps Script URL first."; return; }
+  statusEl.className = "drive-status loading"; statusEl.textContent = "Testing connection...";
+  try {
+    // Use GET for ping — GAS handles GET without CORS issues
+    const resp = await fetch(url + "?action=ping");
+    const text = await resp.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) { data = { ok: false, error: text }; }
+    if (data.ok) {
+      GAS_URL = url;
+      localStorage.setItem("zonal_gas_url", url);
+      statusEl.className = "drive-status ok";
+      statusEl.textContent = "✓ Connected! Auto-sync is now active. Every new entry will push to Drive automatically.";
+    } else {
+      statusEl.className = "drive-status err";
+      statusEl.textContent = "Connected but got unexpected response: " + (data.error || text.substring(0,100));
+    }
+  } catch (e) {
+    statusEl.className = "drive-status err";
+    statusEl.textContent = "Could not connect: " + e.message + ". Make sure you deployed as 'Anyone can access'.";
+  }
+}
+
+async function syncAllToDrive() {
+  const db = loadDB();
+  if (!db.length) { showToast("Nothing to sync."); return; }
+  if (!GAS_URL) { showToast("Set your Apps Script URL first in the Drive Sync tab."); return; }
+  const statusEl = document.getElementById("syncAllStatus");
+  statusEl.className = "drive-status loading";
+  statusEl.textContent = `Syncing ${db.length} entries... (0/${db.length})`;
+  let ok = 0, fail = 0;
+  for (const entry of db) {
+    const result = await pushToDrive(entry, true);
+    if (result.ok) ok++; else fail++;
+    statusEl.textContent = `Syncing... (${ok+fail}/${db.length})`;
+  }
+  statusEl.className = fail === 0 ? "drive-status ok" : "drive-status err";
+  statusEl.textContent = `Done — ${ok} saved to Drive${fail > 0 ? `, ${fail} failed (check console)` : ""}. Check your Drive folder now.`;
+}
+
+async function pullAllFromDrive() {
+  if (!GAS_URL) { showToast("Set your Apps Script URL first."); return; }
+  const statusEl = document.getElementById("pullAllStatus");
+  statusEl.className = "drive-status loading"; statusEl.textContent = "Pulling from Drive...";
+  try {
+    const body = new URLSearchParams({ action: "list", prov: "", city: "" });
+    const resp = await fetch(GAS_URL, { method: "POST", body });
+    const text = await resp.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) { data = { ok: false, error: text.substring(0,100) }; }
+    if (!data.ok) { statusEl.className = "drive-status err"; statusEl.textContent = "Pull failed: " + (data.error||"unknown"); return; }
+    const db = loadDB();
+    const existingIds = new Set(db.map(p => p.id));
+    let added = 0;
+    (data.entries || []).forEach(e => { if (!existingIds.has(e.id)) { db.unshift(e); added++; } });
+    saveDB(db); buildProvFilter(); refreshStats(); applySearch();
+    statusEl.className = "drive-status ok";
+    statusEl.textContent = `✓ Pulled ${added} new entries from Drive. ${(data.entries||[]).length - added} already existed locally.`;
+  } catch (e) {
+    statusEl.className = "drive-status err"; statusEl.textContent = "Pull failed: " + e.message;
+  }
+}
+function openHistoryTable(id){
+  const p=loadDB().find(x=>x.id===id);if(!p)return;
+  const FIELDS=[
+    {key:"tcp",label:"TCP"},
+    {key:"reservation",label:"Reservation Fee"},
+    {key:"monthly",label:"Monthly Amort."},
+    {key:"dp",label:"Down Payment"},
+    {key:"loanable",label:"Loanable Amount"},
+    {key:"term",label:"Loan Term"},
+    {key:"status",label:"Status"},
+  ];
+  const hist=p.history||[];
+  const versions=[
+    {label:"Original",date:p.date,agent:p.agent,verlevel:p.verlevel,data:Object.fromEntries(FIELDS.map(f=>[f.key,p[f.key]||""]))},
+    ...hist.map((h,i)=>{
+      // rebuild state at each version by applying changes
+      const snap={};
+      FIELDS.forEach(f=>{snap[f.key]=p[f.key]||"";});
+      // walk backwards from current to reconstruct each snapshot
+      const allChanges=[...hist.slice(0,i+1)];
+      // start from original
+      const orig={};FIELDS.forEach(f=>{orig[f.key]=p[f.key]||"";});
+      // re-apply changes forward
+      allChanges.forEach(hh=>{(hh.changes||[]).forEach(c=>{FIELDS.forEach(f=>{if(f.label===c.field)orig[f.key]=c.new;});});});
+      return{label:`Update ${i+1}`,date:h.date,agent:h.agent,verlevel:h.verlevel,notes:h.notes,data:orig,changes:(h.changes||[]).map(c=>c.field)};
+    })
+  ];
+
+  let html=`
+  <div class="ht-wrap" id="htWrap">
+    <div class="ht-overlay" onclick="closeHistoryTable()"></div>
+    <div class="ht-box">
+      <div class="ht-hdr">
+        <div>
+          <h3 class="ht-title">Version History</h3>
+          <p class="ht-sub">${p.name} &middot; ${versions.length} version${versions.length!==1?"s":""}</p>
+        </div>
+        <button class="modal-close" onclick="closeHistoryTable()">&#10005;</button>
+      </div>
+      <div class="ht-body">
+        <div class="ht-scroll">
+          <table class="ht-table">
+            <thead>
+              <tr>
+                <th class="ht-field-col">Field</th>
+                ${versions.map((v,i)=>`<th class="ht-ver-col ${i===versions.length-1?"ht-latest":""}">
+                  <div class="ht-ver-label">${v.label}</div>
+                  <div class="ht-ver-date">${v.date}</div>
+                  <div class="ht-ver-agent">${v.agent||"—"}</div>
+                  ${v.notes?`<div class="ht-ver-note">${v.notes}</div>`:""}
+                </th>`).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${FIELDS.map(f=>`<tr>
+                <td class="ht-field-name">${f.label}</td>
+                ${versions.map((v,i)=>{
+                  const val=v.data[f.key]||"—";
+                  const prev=i>0?versions[i-1].data[f.key]||"—":"";
+                  const changed=i>0&&val!==prev;
+                  return`<td class="ht-val ${changed?"ht-changed":""}${i===versions.length-1?" ht-latest-val":""}">${val}${changed?`<span class="ht-was">was: ${prev}</span>`:""}`;
+                }).join("")}
+              </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  const div=document.createElement("div");div.id="histTableMount";div.innerHTML=html;document.body.appendChild(div);
+  document.body.style.overflow="hidden";
+}
+function closeHistoryTable(){
+  const el=document.getElementById("histTableMount");if(el)el.remove();
+  document.body.style.overflow="";
+}
+
+// ══════════════════════════════════════
+// Q2 — NOTIFY TEAM (copy-to-clipboard)
+// ══════════════════════════════════════
+function notifyTeam(id){
+  const p=loadDB().find(x=>x.id===id);if(!p)return;
+  const hist=p.history||[];
+  if(!hist.length){showToast("No updates to notify about yet.");return;}
+  const latest=hist[hist.length-1];
+  const changes=(latest.changes||[]);
+  const changeLines=changes.map(c=>`  • ${c.field}: ${c.old||"—"} → ${c.new}`).join("\n");
+  const msg=`📢 PROPERTY UPDATE — ZONAL REALTY PH
+══════════════════════════════════
+🏠 ${p.name}
+📍 ${p.city}, ${p.prov}
+👤 Updated by: ${latest.agent}
+📅 Date: ${latest.date}
+✅ ${latest.verlevel==="developer"?"Developer-confirmed":latest.verlevel==="agent"?"Agent-verified":"Reference only"}
+${latest.source?"🔗 Source: "+latest.source:""}
+
+📊 What changed:
+${changeLines||"  (See notes below)"}
+${latest.notes?"📝 Notes: "+latest.notes:""}
+
+Please update your records and verify with buyers before quoting the old figures.
+══════════════════════════════════`;
+  navigator.clipboard.writeText(msg).then(()=>{
+    showToast("Team notification copied! Paste in your group chat.");
+  });
+}
+
+// ══════════════════════════════════════
+// Q3 — AUTO-STALE FLAG (90-day check)
+// ══════════════════════════════════════
+const STALE_DAYS=90;
+function checkStaleEntries(){
+  const db=loadDB();
+  const now=new Date();
+  let flagged=0;
+  db.forEach(p=>{
+    if(p.flagged)return; // skip already-flagged
+    const lastUpdated=p.history&&p.history.length
+      ? p.history[p.history.length-1].date
+      : p.date;
+    if(!lastUpdated)return;
+    const parts=lastUpdated.split(" ");
+    const parsed=new Date(lastUpdated);
+    if(isNaN(parsed.getTime()))return;
+    const diffDays=Math.floor((now-parsed)/(1000*60*60*24));
+    if(diffDays>=STALE_DAYS&&!p.autoFlagged){
+      p.flagged=true;
+      p.flagNote=`Auto-flagged: figures not verified in ${diffDays} days. Please re-confirm with developer before sharing.`;
+      p.autoFlagged=true;
+      flagged++;
+    }
+  });
+  if(flagged>0){saveDB(db);refreshStats();applySearch();showToast(`${flagged} entr${flagged>1?"ies":"y"} auto-flagged — figures not updated in ${STALE_DAYS}+ days.`);}
+}
+
+init();
+initDriveStatus();
+// Run stale check on every load
+setTimeout(checkStaleEntries, 800);
+</script>
+</body>
+</html>
