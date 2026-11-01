@@ -254,6 +254,12 @@ textarea{resize:vertical;min-height:52px;line-height:1.6}
 .fd-chips button.on{border-color:var(--gold);color:var(--gold);background:var(--gd)}
 .fd-chips button:focus-visible,.fd-row:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #fdQ{-webkit-appearance:none}
+.mtabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--b1);overflow-x:auto}
+.mtab{padding:10px 16px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--td);font-size:13px;font-weight:600;letter-spacing:.04em;cursor:pointer;white-space:nowrap;font-family:inherit}
+.mtab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.mtab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.mpane{display:none}.mpane.on{display:block}
+.mpane-narrow{max-width:640px}
 .toprow{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
 .toprow .fd-list{max-height:520px}
 @media(max-width:740px){.toprow{grid-template-columns:1fr}}
@@ -311,13 +317,13 @@ textarea{resize:vertical;min-height:52px;line-height:1.6}
 </header>
 
 <div class="wrap">
-  <div class="steps">
-    <div class="step active" id="s1"><span class="sn">01</span>Property</div>
-    <div class="step" id="s2"><span class="sn">02</span>Position</div>
-    <div class="step" id="s3"><span class="sn">03</span>Configure</div>
-    <div class="step" id="s4"><span class="sn">04</span>Generate</div>
-  </div>
 
+  <div class="mtabs" role="tablist">
+    <button type="button" class="mtab on" data-t="find" role="tab">🔎 Find a Unit</button>
+    <button type="button" class="mtab" data-t="zonal" role="tab">🏡 Zonal Realty Properties</button>
+    <button type="button" class="mtab" data-t="lhoopa" role="tab">🏚️ Lhoopa</button>
+  </div>
+  <div class="mpane on" id="pane-find">
   <div class="toprow">
       <div class="panel" id="finder">
         <div class="ph"><div class="dot"></div><span>Find a Unit</span></div>
@@ -338,10 +344,8 @@ textarea{resize:vertical;min-height:52px;line-height:1.6}
       </div>
   </div>
 
-  <div class="grid">
-    <!-- LEFT -->
-    <div>
-      <!-- QUICK FINDER -->
+  </div>
+  <div class="mpane" id="pane-zonal"><div class="mpane-narrow">
       <!-- ZONAL REALTY BROWSE -->
       <div class="panel">
         <div class="ph"><div class="dot"></div><span>Zonal Realty Properties</span></div>
@@ -393,6 +397,8 @@ textarea{resize:vertical;min-height:52px;line-height:1.6}
         </div>
       </div>
 
+  </div></div>
+  <div class="mpane" id="pane-lhoopa"><div class="mpane-narrow">
       <!-- LHOOPA BROWSE — separate section -->
       <div class="panel">
         <div class="ph"><div class="dot"></div><span>Lhoopa Properties</span></div>
@@ -418,6 +424,12 @@ textarea{resize:vertical;min-height:52px;line-height:1.6}
         </div>
       </div>
 
+  </div></div>
+
+  <div class="grid" id="workGrid" hidden>
+    <!-- LEFT -->
+    <div>
+      <!-- QUICK FINDER -->
       <div class="panel">
         <div class="ph"><div class="dot"></div><span>Agent Details</span></div>
         <div class="pb">
@@ -2720,7 +2732,7 @@ function cpVer(srcId,btnId){
   });
 }
 
-// ── GENERATION HISTORY — 10 entries max ───────────────────────
+// ── GENERATION HISTORY — 5 entries max ───────────────────────
 const HIST_KEY='epd_history';
 function loadHistory(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]');}catch{return[];}}
 function saveHistory(h){try{localStorage.setItem(HIST_KEY,JSON.stringify(h));}catch{}}
@@ -2755,7 +2767,7 @@ function addHistory(p,outType,amort,position){
     inBrgy:document.getElementById('inBrgy')?.value||''
   };
   h.unshift(entry);
-  if(h.length>10) h.length=10;
+  if(h.length>5) h.length=5;
   saveHistory(h);
   renderHistory(h);
 }
@@ -2763,6 +2775,7 @@ function renderHistory(h){
   const panel=document.getElementById('historyPanel');
   if(!panel)return;
   if(!h||!h.length){panel.innerHTML='<div class="hist-empty">No generations yet — history will appear here.</div>';return;}
+  h=h.slice(0,5);
   panel.innerHTML=h.map((e,i)=>{
     const d=new Date(e.ts);
     const timeStr=d.toLocaleDateString('en-PH',{month:'short',day:'numeric'})+' · '+d.toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
@@ -3209,10 +3222,13 @@ function fdRender(){
     +(L.length>60?'<div style="font-size:11px;color:var(--td);padding:6px 2px">Showing first 60. Type more to narrow down.</div>':'')
     +(L.length?'':'<div style="font-size:12px;color:var(--td);padding:12px 2px">No units match. Try removing a filter.</div>');
 }
+function mTab(t){const g=document.getElementById('workGrid');if(g)g.hidden=(t==='find');document.querySelectorAll('.mtab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));document.querySelectorAll('.mpane').forEach(x=>x.classList.toggle('on',x.id==='pane-'+t));}
+document.addEventListener('click',e=>{const b=e.target.closest('.mtab');if(b)mTab(b.dataset.t);});
 function fdPick(id){
   const p=PROPS.find(x=>x.id===id); if(!p)return;
   const set=(sid,v)=>{const el=document.getElementById(sid);if(el)el.value=v;};
   const city=normCity(p.city), mdl=p.model||p.type;
+  mTab(p.db==='lhoopa'?'lhoopa':'zonal');
   if(p.db==='lhoopa'){
     set('selLhProv',p.prov);onProv('lhoopa');set('selLhMuni',city);onMuni('lhoopa');set('selLhProj',p.name);onLhProject();set('selLhModel',mdl);onLhModel();
     document.getElementById('lhPropCard').scrollIntoView({behavior:'smooth',block:'center'});
